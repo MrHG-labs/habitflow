@@ -63,6 +63,18 @@ export const translations = {
     gamification: {
       levelUp: '¡NIVEL {level}!',
       congrats: '¡Felicidades! Has alcanzado un nuevo nivel.',
+    },
+    levels: {
+      1: 'Novato',
+      2: 'Explorador',
+      3: 'Triunfador',
+      4: 'Campeón',
+      5: 'Leyenda',
+      6: 'Maestro',
+      7: 'Élite',
+      8: 'Héroe',
+      9: 'Mito',
+      10: 'Inmortal',
     }
   },
   en: {
@@ -127,6 +139,18 @@ export const translations = {
     gamification: {
       levelUp: 'LEVEL {level}!',
       congrats: 'Congratulations! You reached a new level.',
+    },
+    levels: {
+      1: 'Novice',
+      2: 'Explorer',
+      3: 'Achiever',
+      4: 'Champion',
+      5: 'Legend',
+      6: 'Master',
+      7: 'Elite',
+      8: 'Hero',
+      9: 'Myth',
+      10: 'Immortal',
     }
   }
 };
