@@ -14,7 +14,6 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
-
     try {
       await login({ email, password });
       router.push('/dashboard');
@@ -24,22 +23,36 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+    <div
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{
+        background: 'linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%)',
+      }}
+    >
+      <div
+        className="card w-full max-w-md p-8 animate-fade-in"
+        style={{ animation: 'fadeIn 0.35s ease-out' }}
+      >
+        {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">HabitFlow</h1>
-          <p className="text-gray-600 mt-2">Welcome back!</p>
+          <div className="text-5xl mb-3">⚡</div>
+          <h1 className="text-3xl font-bold text-app-primary">HabitFlow</h1>
+          <p className="text-app-secondary mt-1">Welcome back!</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* 5.3 Error state */}
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
-              {error}
+            <div
+              className="p-3 rounded-lg text-sm font-medium"
+              style={{ backgroundColor: '#fee2e2', color: 'var(--danger)' }}
+            >
+              ⚠️ {error}
             </div>
           )}
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="space-y-1">
+            <label htmlFor="email" className="block text-sm font-medium text-app-secondary">
               Email
             </label>
             <input
@@ -48,13 +61,18 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-3 rounded-lg text-app-primary text-sm
+                         focus:outline-none focus:ring-2 transition-all duration-150"
+              style={{
+                backgroundColor: 'var(--bg-app)',
+                border: '1px solid var(--border)',
+              }}
               placeholder="you@example.com"
             />
           </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="space-y-1">
+            <label htmlFor="password" className="block text-sm font-medium text-app-secondary">
               Password
             </label>
             <input
@@ -63,23 +81,40 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-3 rounded-lg text-app-primary text-sm
+                         focus:outline-none focus:ring-2 transition-all duration-150"
+              style={{
+                backgroundColor: 'var(--bg-app)',
+                border: '1px solid var(--border)',
+              }}
               placeholder="••••••••"
             />
           </div>
 
+          {/* 5.4 Micro-interaction on button */}
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50"
+            className="btn-primary w-full py-3 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Signing in...' : 'Sign In'}
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                Signing in...
+              </span>
+            ) : (
+              'Sign In'
+            )}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-gray-600">
+        <p className="mt-6 text-center text-app-secondary text-sm">
           Don&apos;t have an account?{' '}
-          <Link href="/register" className="text-indigo-600 hover:underline font-medium">
+          <Link
+            href="/register"
+            className="font-semibold transition-colors duration-150"
+            style={{ color: 'var(--accent)' }}
+          >
             Sign up
           </Link>
         </p>

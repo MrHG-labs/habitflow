@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
+import { useThemeStore } from '@/stores/themeStore';
 import LevelBadge from '@/components/dashboard/LevelBadge';
 
 export default function DashboardLayout({
@@ -13,6 +14,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, isLoading, checkAuth, user } = useAuthStore();
+  const { theme, toggle } = useThemeStore();
 
   useEffect(() => {
     checkAuth();
@@ -24,64 +26,121 @@ export default function DashboardLayout({
     }
   }, [isAuthenticated, isLoading, router]);
 
+  /* 5.3 — Loading state */
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-gray-600">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg-app)' }}>
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 rounded-full border-4 border-indigo-200 border-t-indigo-600 animate-spin" />
+          <p className="text-app-secondary text-sm">Loading HabitFlow...</p>
+        </div>
       </div>
     );
   }
 
-  if (!isAuthenticated) {
-    return null;
-  }
+  if (!isAuthenticated) return null;
+
+  const navLinks = [
+    { label: 'Dashboard', href: '/dashboard' },
+    { label: 'Habits', href: '/habits' },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b border-gray-200">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-app)' }}>
+      {/* 5.2 Responsive navbar */}
+      <nav className="nav-bg sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-bold text-indigo-600">HabitFlow</h1>
+          <div className="flex items-center justify-between h-16 gap-4">
+
+            {/* Brand */}
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-2xl">⚡</span>
+              <h1 className="text-lg font-bold" style={{ color: 'var(--accent)' }}>
+                HabitFlow
+              </h1>
             </div>
-            <div className="flex items-center gap-3">
+
+            {/* Nav links — hidden on mobile, visible sm+ */}
+            <div className="hidden sm:flex items-center gap-1">
+              {navLinks.map(({ label, href }) => (
+                <button
+                  key={href}
+                  onClick={() => router.push(href)}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+                    pathname === href
+                      ? 'text-white'
+                      : 'text-app-secondary hover:text-app-primary'
+                  }`}
+                  style={
+                    pathname === href
+                      ? { backgroundColor: 'var(--accent)' }
+                      : {}
+                  }
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {/* Right side: badge + dark toggle + logout */}
+            <div className="flex items-center gap-2">
+              {/* Level badge (hidden on xs) */}
               {user && (
-                <LevelBadge level={user.level} xp={user.xp} compact />
+                <div className="hidden sm:block">
+                  <LevelBadge level={user.level} xp={user.xp} compact />
+                </div>
               )}
+
+              {/* 5.1 Dark / Light toggle */}
               <button
-                onClick={() => router.push('/dashboard')}
-                className={`px-3 py-2 rounded-md text-sm font-medium ${
-                  pathname === '/dashboard'
-                    ? 'bg-indigo-100 text-indigo-700'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
+                onClick={toggle}
+                aria-label="Toggle dark mode"
+                className="w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-all duration-150 hover:scale-110 active:scale-95"
+                style={{ backgroundColor: 'var(--bg-app)', border: '1px solid var(--border)' }}
+                title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
               >
-                Dashboard
+                {theme === 'dark' ? '☀️' : '🌙'}
               </button>
-              <button
-                onClick={() => router.push('/habits')}
-                className={`px-3 py-2 rounded-md text-sm font-medium ${
-                  pathname === '/habits'
-                    ? 'bg-indigo-100 text-indigo-700'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Habits
-              </button>
+
+              {/* Logout */}
               <button
                 onClick={() => {
                   useAuthStore.getState().logout();
                   router.push('/login');
                 }}
-                className="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100"
+                className="px-3 py-1.5 rounded-lg text-sm font-medium text-app-secondary border transition-all duration-150 hover:text-danger"
+                style={{ borderColor: 'var(--border)' }}
               >
-                Logout
+                <span className="hidden sm:inline">Logout</span>
+                <span className="sm:hidden">↩</span>
               </button>
             </div>
           </div>
+
+          {/* Mobile nav links — only on xs */}
+          <div className="sm:hidden flex items-center gap-1 pb-2">
+            {navLinks.map(({ label, href }) => (
+              <button
+                key={href}
+                onClick={() => router.push(href)}
+                className={`flex-1 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  pathname === href ? 'text-white' : 'text-app-secondary'
+                }`}
+                style={
+                  pathname === href
+                    ? { backgroundColor: 'var(--accent)' }
+                    : {}
+                }
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </nav>
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+
+      {/* Main page content */}
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {children}
       </main>
     </div>
