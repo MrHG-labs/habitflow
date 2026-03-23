@@ -3,15 +3,27 @@
 import { useState } from 'react';
 import { Habit } from '@/types/habit';
 import { useDeleteHabit } from '@/hooks/useHabits';
+import { useToggleHabit } from '@/hooks/useProgress';
+import StreakBadge from './StreakBadge';
 
 interface HabitCardProps {
   habit: Habit;
+  completed: boolean;
   onEdit: (habit: Habit) => void;
 }
 
-export default function HabitCard({ habit, onEdit }: HabitCardProps) {
+export default function HabitCard({ habit, completed, onEdit }: HabitCardProps) {
   const deleteHabit = useDeleteHabit();
+  const toggleHabit = useToggleHabit();
   const [showConfirm, setShowConfirm] = useState(false);
+  const [animating, setAnimating] = useState(false);
+
+  const handleToggle = () => {
+    if (toggleHabit.isPending) return;
+    setAnimating(true);
+    setTimeout(() => setAnimating(false), 600);
+    toggleHabit.mutate(habit.id);
+  };
 
   const handleDelete = () => {
     deleteHabit.mutate(habit.id);
@@ -20,13 +32,54 @@ export default function HabitCard({ habit, onEdit }: HabitCardProps) {
 
   return (
     <div
-      className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex items-center gap-4"
+      className={`relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex items-center gap-4 transition-all duration-300 ${
+        completed ? 'opacity-75' : ''
+      }`}
       style={{ borderLeftColor: habit.color, borderLeftWidth: '4px' }}
     >
+      {/* Checkbox with animation */}
+      <button
+        onClick={handleToggle}
+        disabled={toggleHabit.isPending}
+        aria-label={completed ? 'Mark incomplete' : 'Mark complete'}
+        className={`relative w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300 ${
+          completed
+            ? 'border-transparent bg-green-500 scale-110'
+            : 'border-gray-300 hover:border-green-400'
+        } ${animating && completed ? 'animate-bounce' : ''}`}
+        style={completed ? {} : { borderColor: habit.color }}
+      >
+        {completed && (
+          <svg
+            className="w-5 h-5 text-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={3}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        )}
+      </button>
+
+      {/* Icon + text */}
       <div className="text-2xl">{habit.icon}</div>
 
       <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-gray-800 truncate">{habit.name}</h3>
+        <div className="flex items-center gap-2 flex-wrap">
+          <h3
+            className={`font-semibold text-gray-800 truncate transition-all duration-300 ${
+              completed ? 'line-through text-gray-400' : ''
+            }`}
+          >
+            {habit.name}
+          </h3>
+          <StreakBadge habitId={habit.id} />
+        </div>
         {habit.description && (
           <p className="text-sm text-gray-500 truncate">{habit.description}</p>
         )}
@@ -35,6 +88,7 @@ export default function HabitCard({ habit, onEdit }: HabitCardProps) {
         </span>
       </div>
 
+      {/* Edit / Delete */}
       <div className="flex items-center gap-2 shrink-0">
         <button
           onClick={() => onEdit(habit)}
@@ -70,6 +124,11 @@ export default function HabitCard({ habit, onEdit }: HabitCardProps) {
           </button>
         )}
       </div>
+
+      {/* Completion celebracion flash */}
+      {animating && completed && (
+        <div className="absolute inset-0 rounded-xl bg-green-100 opacity-40 pointer-events-none animate-ping" />
+      )}
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { Habit } from '@/types/habit';
 import { useHabits } from '@/hooks/useHabits';
+import { useTodayProgress } from '@/hooks/useProgress';
 import HabitCard from './HabitCard';
 
 interface HabitListProps {
@@ -10,6 +11,7 @@ interface HabitListProps {
 
 export default function HabitList({ onEdit }: HabitListProps) {
   const { data: habits, isLoading, error } = useHabits();
+  const { data: todayProgress } = useTodayProgress();
 
   if (isLoading) {
     return (
@@ -20,7 +22,8 @@ export default function HabitList({ onEdit }: HabitListProps) {
             className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 animate-pulse"
           >
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-gray-200 rounded-lg" />
+              <div className="w-10 h-10 bg-gray-200 rounded-full" />
+              <div className="w-8 h-8 bg-gray-200 rounded-lg" />
               <div className="flex-1">
                 <div className="h-4 bg-gray-200 rounded w-1/3 mb-2" />
                 <div className="h-3 bg-gray-100 rounded w-1/2" />
@@ -55,7 +58,12 @@ export default function HabitList({ onEdit }: HabitListProps) {
   return (
     <div className="space-y-3">
       {habits.map((habit) => (
-        <HabitCard key={habit.id} habit={habit} onEdit={onEdit} />
+        <HabitCard
+          key={habit.id}
+          habit={habit}
+          completed={todayProgress?.[habit.id] ?? false}
+          onEdit={onEdit}
+        />
       ))}
     </div>
   );
