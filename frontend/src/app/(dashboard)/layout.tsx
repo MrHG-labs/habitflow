@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
+import LevelBadge from '@/components/dashboard/LevelBadge';
 
 export default function DashboardLayout({
   children,
@@ -11,7 +12,7 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated, isLoading, checkAuth } = useAuthStore();
+  const { isAuthenticated, isLoading, checkAuth, user } = useAuthStore();
 
   useEffect(() => {
     checkAuth();
@@ -43,7 +44,10 @@ export default function DashboardLayout({
             <div className="flex items-center">
               <h1 className="text-xl font-bold text-indigo-600">HabitFlow</h1>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-3">
+              {user && (
+                <LevelBadge level={user.level} xp={user.xp} compact />
+              )}
               <button
                 onClick={() => router.push('/dashboard')}
                 className={`px-3 py-2 rounded-md text-sm font-medium ${

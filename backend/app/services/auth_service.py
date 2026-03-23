@@ -65,3 +65,45 @@ def create_user(session: Session, email: str, username: str, password: str) -> U
     session.commit()
     session.refresh(user)
     return user
+
+
+# ── Gamification ── #
+
+XP_PER_HABIT = 10
+
+# Level thresholds: XP needed to reach each level.
+# Level 1 = 0, Level 2 = 100, Level 3 = 250, Level 4 = 450, ...
+# Formula: xp_for_level(n) = 100 * (n-1) + 50 * (n-2)*(n-1) // 2  → simplified below
+LEVEL_THRESHOLDS = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700, 3250]
+
+
+def calculate_level(xp: int) -> int:
+    """Return the level corresponding to a given XP total."""
+    level = 1
+    for idx, threshold in enumerate(LEVEL_THRESHOLDS):
+        if xp >= threshold:
+            level = idx + 1
+        else:
+            break
+    return level
+
+
+def award_xp(session: Session, user: User, completed: bool) -> tuple[User, bool]:
+    """
+    Award or revoke XP when a habit is toggled.
+    Returns (updated_user, leveled_up).
+    """
+    old_level = user.level
+
+    if completed:
+        user.xp = max(0, user.xp + XP_PER_HABIT)
+    else:
+        user.xp = max(0, user.xp - XP_PER_HABIT)
+
+    user.level = calculate_level(user.xp)
+    leveled_up = user.level > old_level
+
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return user, leveled_up

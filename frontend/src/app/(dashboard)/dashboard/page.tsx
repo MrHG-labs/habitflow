@@ -3,6 +3,7 @@
 import { useAuthStore } from '@/stores/authStore';
 import { useHabits } from '@/hooks/useHabits';
 import { useTodayProgress, useWeeklyProgress } from '@/hooks/useProgress';
+import LevelBadge from '@/components/dashboard/LevelBadge';
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
@@ -32,8 +33,8 @@ export default function DashboardPage() {
       {/* Stats row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-          <div className="text-sm text-gray-500 mb-1">Level</div>
-          <div className="text-3xl font-bold text-indigo-600">{user?.level || 1}</div>
+          <div className="text-sm text-gray-500 mb-3">Your Level</div>
+          <LevelBadge level={user?.level ?? 1} xp={user?.xp ?? 0} />
         </div>
 
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">

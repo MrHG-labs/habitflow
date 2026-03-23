@@ -1,8 +1,9 @@
 import { apiClient } from './client';
+import { ToggleResult } from '@/types/progress';
 
 export const progressApi = {
-  toggleToday: async (habitId: number): Promise<{ habit_id: number; completed: boolean; date: string }> => {
-    const response = await apiClient.post(`/progress/${habitId}/toggle`);
+  toggleToday: async (habitId: number): Promise<ToggleResult> => {
+    const response = await apiClient.post<ToggleResult>(`/progress/${habitId}/toggle`);
     return response.data;
   },
 
