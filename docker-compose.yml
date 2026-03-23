@@ -1,28 +1,51 @@
-version: '3.8'
-
 services:
+  # ── Backend: FastAPI + SQLModel (SQLite) ──
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: habitflow_backend
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - /app/.venv
     environment:
       - DATABASE_URL=sqlite:///./habitflow.db
       - SECRET_KEY=dev-secret-key-change-in-production
-    volumes:
-      - ./backend:/app
+      - ENVIRONMENT=development
+    restart: unless-stopped
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - habitflow_net
 
+  # ── Frontend: Next.js + React Query ──
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    container_name: habitflow_frontend
+    depends_on:
+      backend:
+        condition: service_started
     ports:
       - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
     volumes:
       - ./frontend:/app
       - /app/node_modules
+      - /app/.next
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    restart: unless-stopped
     command: npm run dev
+    networks:
+      - habitflow_net
+
+networks:
+  habitflow_net:
+    driver: bridge

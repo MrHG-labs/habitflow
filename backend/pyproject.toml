@@ -16,5 +16,6 @@ dependencies = [
     "ruff==0.7.4",
     "sqlalchemy==2.0.35",
     "sqlmodel==0.0.21",
+    "email-validator",
     "uvicorn[standard]==0.32.0",
 ]

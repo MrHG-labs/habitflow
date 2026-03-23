@@ -1,0 +1,14 @@
+__pycache__/
+*.py[oc]
+.venv/
+.git/
+.gitignore
+.dockerignore
+.python-version
+habitflow.db
+alembic/
+*.egg-info
+build/
+dist/
+Dockerfile
+tests/
