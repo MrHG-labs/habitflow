@@ -1,8 +1,7 @@
-'use client';
-
 import { Habit } from '@/types/habit';
 import { useHabits } from '@/hooks/useHabits';
 import { useTodayProgress } from '@/hooks/useProgress';
+import { useI18nStore } from '@/stores/i18nStore';
 import HabitCard from './HabitCard';
 
 interface HabitListProps {
@@ -24,6 +23,7 @@ function HabitSkeleton() {
 }
 
 export default function HabitList({ onEdit }: HabitListProps) {
+  const { t } = useI18nStore();
   const { data: habits, isLoading, error } = useHabits();
   const { data: todayProgress } = useTodayProgress();
 
@@ -37,24 +37,25 @@ export default function HabitList({ onEdit }: HabitListProps) {
 
   if (error) {
     return (
-      <div className="card p-4 text-sm font-medium" style={{ color: 'var(--danger)', borderColor: 'var(--danger)' }}>
-        ⚠️ Error loading habits. Please try again.
+      <div className="card p-5 border-l-4 rounded-xl flex items-center gap-3" style={{ color: 'var(--danger)', borderColor: 'var(--danger)' }}>
+        <span className="text-xl">⚠️</span>
+        <p className="font-semibold text-sm">{t('common.error')}</p>
       </div>
     );
   }
 
   if (!habits || habits.length === 0) {
     return (
-      <div className="card p-10 text-center">
-        <div className="text-5xl mb-3">🎯</div>
-        <p className="font-semibold text-app-primary mb-1">No habits yet</p>
-        <p className="text-app-muted text-sm">Create your first habit to start building better routines!</p>
+      <div className="card p-10 text-center flex flex-col items-center">
+        <div className="text-5xl mb-4 grayscale opacity-30">🎯</div>
+        <p className="font-bold text-xl text-app-primary mb-2">{t('habits.noHabits')}</p>
+        <p className="max-w-[280px] text-app-secondary text-sm leading-relaxed">{t('habits.createFirst')}</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {habits.map((habit) => (
         <HabitCard
           key={habit.id}

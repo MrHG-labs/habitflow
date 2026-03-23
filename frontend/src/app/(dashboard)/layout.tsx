@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { useThemeStore } from '@/stores/themeStore';
+import { useI18nStore } from '@/stores/i18nStore';
 import LevelBadge from '@/components/dashboard/LevelBadge';
 
 export default function DashboardLayout({
@@ -14,7 +15,8 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, isLoading, checkAuth, user } = useAuthStore();
-  const { theme, toggle } = useThemeStore();
+  const { theme, toggle: toggleTheme } = useThemeStore();
+  const { language, setLanguage, t } = useI18nStore();
 
   useEffect(() => {
     checkAuth();
@@ -29,10 +31,10 @@ export default function DashboardLayout({
   /* 5.3 — Loading state */
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg-app)' }}>
+      <div className="min-h-screen flex items-center justify-center transition-colors" style={{ backgroundColor: 'var(--bg-app)' }}>
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 rounded-full border-4 border-indigo-200 border-t-indigo-600 animate-spin" />
-          <p className="text-app-secondary text-sm">Loading HabitFlow...</p>
+          <p className="text-app-secondary text-sm">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -41,8 +43,8 @@ export default function DashboardLayout({
   if (!isAuthenticated) return null;
 
   const navLinks = [
-    { label: 'Dashboard', href: '/dashboard' },
-    { label: 'Habits', href: '/habits' },
+    { label: t('common.dashboard'), href: '/dashboard' },
+    { label: t('common.habits'), href: '/habits' },
   ];
 
   return (
@@ -91,9 +93,20 @@ export default function DashboardLayout({
                 </div>
               )}
 
+              {/* Language toggle */}
+              <button
+                onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
+                aria-label="Toggle language"
+                className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs transition-all duration-150 hover:scale-110 active:scale-95"
+                style={{ backgroundColor: 'var(--bg-app)', border: '1px solid var(--border)', color: 'var(--app-primary)' }}
+                title={language === 'es' ? 'Switch to English' : 'Cambiar a Español'}
+              >
+                {language === 'es' ? 'ES' : 'EN'}
+              </button>
+
               {/* 5.1 Dark / Light toggle */}
               <button
-                onClick={toggle}
+                onClick={toggleTheme}
                 aria-label="Toggle dark mode"
                 className="w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-all duration-150 hover:scale-110 active:scale-95"
                 style={{ backgroundColor: 'var(--bg-app)', border: '1px solid var(--border)' }}
@@ -108,10 +121,10 @@ export default function DashboardLayout({
                   useAuthStore.getState().logout();
                   router.push('/login');
                 }}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium text-app-secondary border transition-all duration-150 hover:text-danger"
+                className="px-3 py-1.5 rounded-lg text-sm font-medium text-app-secondary border transition-all duration-150 hover:text-danger hover:border-danger"
                 style={{ borderColor: 'var(--border)' }}
               >
-                <span className="hidden sm:inline">Logout</span>
+                <span className="hidden sm:inline">{t('common.logout')}</span>
                 <span className="sm:hidden">↩</span>
               </button>
             </div>

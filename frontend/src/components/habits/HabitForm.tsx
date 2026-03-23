@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Habit, HabitCreate, HabitUpdate } from '@/types/habit';
 import { useCreateHabit, useUpdateHabit } from '@/hooks/useHabits';
+import { useI18nStore } from '@/stores/i18nStore';
 
 interface HabitFormProps {
   habit?: Habit | null;
@@ -13,6 +14,7 @@ const ICONS = ['📌', '💪', '📚', '💧', '🧘', '🏃', '🎯', '✍️',
 const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#eab308', '#22c55e', '#14b8a6', '#3b82f6', '#6b7280'];
 
 export default function HabitForm({ habit, onClose }: HabitFormProps) {
+  const { t } = useI18nStore();
   const createHabit = useCreateHabit();
   const updateHabit = useUpdateHabit();
 
@@ -49,13 +51,13 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-300"
       style={{ backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       {/* 5.2 Sheet on mobile, centered modal on sm+ */}
       <div
-        className="card w-full sm:max-w-md p-6 rounded-t-2xl sm:rounded-2xl"
+        className="card w-full sm:max-w-md p-6 rounded-t-2xl sm:rounded-2xl shadow-2xl animate-in fade-in slide-in-from-bottom-5 duration-300"
         style={{ maxHeight: '90vh', overflowY: 'auto' }}
       >
         {/* Handle bar (mobile) */}
@@ -63,9 +65,9 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
           <div className="w-10 h-1 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
         </div>
 
-        <div className="flex justify-between items-center mb-5">
+        <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-app-primary">
-            {isEditing ? 'Edit Habit' : 'New Habit'}
+            {isEditing ? t('habits.edit') : t('habits.add')}
           </h2>
           <button
             onClick={onClose}
@@ -76,45 +78,45 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {/* Name */}
-          <div className="space-y-1">
-            <label htmlFor="habit-name" className="block text-sm font-medium text-app-secondary">Name</label>
+          <div className="space-y-1.5">
+            <label htmlFor="habit-name" className="block text-sm font-semibold text-app-secondary px-1">{t('habits.name')}</label>
             <input
               id="habit-name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full px-4 py-2.5 rounded-lg text-app-primary text-sm focus:outline-none focus:ring-2 transition-all"
+              className="w-full px-4 py-3 rounded-xl text-app-primary text-sm focus:outline-none focus:ring-2 ring-indigo-500/20 transition-all"
               style={{ backgroundColor: 'var(--bg-app)', border: '1px solid var(--border)' }}
-              placeholder="e.g. Morning workout"
+              placeholder={t('habits.name')}
             />
           </div>
 
           {/* Description */}
-          <div className="space-y-1">
-            <label htmlFor="habit-description" className="block text-sm font-medium text-app-secondary">Description</label>
+          <div className="space-y-1.5">
+            <label htmlFor="habit-description" className="block text-sm font-semibold text-app-secondary px-1">{t('habits.description')}</label>
             <input
               id="habit-description"
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg text-app-primary text-sm focus:outline-none focus:ring-2 transition-all"
+              className="w-full px-4 py-3 rounded-xl text-app-primary text-sm focus:outline-none focus:ring-2 ring-indigo-500/20 transition-all"
               style={{ backgroundColor: 'var(--bg-app)', border: '1px solid var(--border)' }}
-              placeholder="Optional"
+              placeholder={t('habits.description')}
             />
           </div>
 
           {/* Icon picker */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-app-secondary">Icon</label>
-            <div className="flex flex-wrap gap-2">
+            <label className="block text-sm font-semibold text-app-secondary px-1">{t('habits.icon')}</label>
+            <div className="flex flex-wrap gap-2.5">
               {ICONS.map((i) => (
                 <button
                   key={i} type="button" onClick={() => setIcon(i)}
-                  className={`w-10 h-10 rounded-xl text-xl flex items-center justify-center transition-all duration-150 ${
-                    icon === i ? 'ring-2 scale-110' : 'hover:scale-105'
+                  className={`w-11 h-11 rounded-xl text-xl flex items-center justify-center transition-all duration-200 ${
+                    icon === i ? 'ring-2 scale-110 shadow-lg' : 'hover:scale-105 opacity-60 hover:opacity-100'
                   }`}
                   style={{
                     backgroundColor: icon === i ? 'var(--accent-light)' : 'var(--bg-app)',
@@ -129,12 +131,12 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
 
           {/* Color picker */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-app-secondary">Color</label>
-            <div className="flex flex-wrap gap-2">
+            <label className="block text-sm font-semibold text-app-secondary px-1">{t('habits.color')}</label>
+            <div className="flex flex-wrap gap-3">
               {COLORS.map((c) => (
                 <button
                   key={c} type="button" onClick={() => setColor(c)}
-                  className={`w-8 h-8 rounded-full transition-all duration-150 ${color === c ? 'scale-125' : 'hover:scale-110'}`}
+                  className={`w-9 h-9 rounded-full transition-all duration-300 ${color === c ? 'scale-125 shadow-md ring-offset-2 ring-2 ring-indigo-500/30' : 'hover:scale-110'}`}
                   style={{
                     backgroundColor: c,
                     outline: color === c ? `3px solid var(--accent)` : 'none',
@@ -146,39 +148,39 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
           </div>
 
           {/* Frequency */}
-          <div className="space-y-1">
-            <label htmlFor="habit-frequency" className="block text-sm font-medium text-app-secondary">Frequency</label>
+          <div className="space-y-1.5">
+            <label htmlFor="habit-frequency" className="block text-sm font-semibold text-app-secondary px-1">{t('habits.frequency')}</label>
             <select
               id="habit-frequency"
               value={frequency}
               onChange={(e) => setFrequency(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg text-app-primary text-sm focus:outline-none focus:ring-2 transition-all"
+              className="w-full px-4 py-3 rounded-xl text-app-primary text-sm focus:outline-none focus:ring-2 ring-indigo-500/20 transition-all appearance-none cursor-pointer"
               style={{ backgroundColor: 'var(--bg-app)', border: '1px solid var(--border)' }}
             >
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
+              <option value="daily">{t('habits.daily')}</option>
+              <option value="weekly">{t('habits.weekly')}</option>
             </select>
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-1">
+          <div className="flex gap-4 pt-3">
             <button
               type="button" onClick={onClose}
-              className="flex-1 py-2.5 rounded-lg text-sm font-medium text-app-secondary transition-all duration-150 hover:scale-[1.02] active:scale-[0.98]"
+              className="flex-1 py-3 rounded-xl text-sm font-semibold text-app-secondary transition-all duration-150 hover:bg-black/5 dark:hover:bg-white/5 active:scale-95"
               style={{ border: '1px solid var(--border)' }}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit" disabled={isPending}
-              className="btn-primary flex-1 py-2.5 text-sm font-semibold disabled:opacity-50"
+              className="btn-primary flex-1 py-3 text-sm font-bold disabled:opacity-50 shadow-lg shadow-indigo-500/20 active:scale-95"
             >
               {isPending ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  Saving...
+                  {t('common.loading')}
                 </span>
-              ) : isEditing ? 'Update' : 'Create'}
+              ) : isEditing ? t('common.save') : t('habits.add')}
             </button>
           </div>
         </form>

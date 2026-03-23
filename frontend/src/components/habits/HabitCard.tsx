@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Habit } from '@/types/habit';
 import { useDeleteHabit } from '@/hooks/useHabits';
 import { useToggleHabit } from '@/hooks/useProgress';
 import { useAuthStore } from '@/stores/authStore';
+import { useI18nStore } from '@/stores/i18nStore';
 import StreakBadge from './StreakBadge';
 import XpPopup from '@/components/dashboard/XpPopup';
 import LevelUpModal from '@/components/dashboard/LevelUpModal';
@@ -16,6 +17,7 @@ interface HabitCardProps {
 }
 
 export default function HabitCard({ habit, completed, onEdit }: HabitCardProps) {
+  const { t } = useI18nStore();
   const deleteHabit = useDeleteHabit();
   const toggleHabit = useToggleHabit();
   const { checkAuth } = useAuthStore();
@@ -54,6 +56,8 @@ export default function HabitCard({ habit, completed, onEdit }: HabitCardProps) 
     setShowConfirm(false);
   };
 
+  const translatedFreq = habit.frequency.toLowerCase() === 'daily' ? t('habits.daily') : t('habits.weekly');
+
   return (
     <>
       <div
@@ -66,7 +70,7 @@ export default function HabitCard({ habit, completed, onEdit }: HabitCardProps) 
         <button
           onClick={handleToggle}
           disabled={toggleHabit.isPending}
-          aria-label={completed ? 'Mark incomplete' : 'Mark complete'}
+          aria-label={completed ? t('common.save') : t('common.save')}
           className={`relative w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300 ${
             completed ? 'border-transparent scale-110' : ''
           } ${animating && completed ? 'animate-bounce' : ''}`}
@@ -104,7 +108,7 @@ export default function HabitCard({ habit, completed, onEdit }: HabitCardProps) 
             className="inline-block mt-1 text-xs px-2 py-0.5 rounded-full"
             style={{ backgroundColor: 'var(--bg-app)', color: 'var(--text-muted)' }}
           >
-            {habit.frequency}
+            {translatedFreq}
           </span>
         </div>
 
@@ -114,7 +118,7 @@ export default function HabitCard({ habit, completed, onEdit }: HabitCardProps) 
             onClick={() => onEdit(habit)}
             className="p-2 rounded-lg text-app-muted transition-all duration-150 hover:scale-110 active:scale-90"
             style={{ backgroundColor: 'transparent' }}
-            aria-label="Edit habit"
+            title={t('common.edit')}
           >
             ✏️
           </button>
@@ -127,7 +131,7 @@ export default function HabitCard({ habit, completed, onEdit }: HabitCardProps) 
                 className="px-2 py-1 text-xs font-medium text-white rounded-lg transition-all disabled:opacity-50"
                 style={{ backgroundColor: 'var(--danger)' }}
               >
-                {deleteHabit.isPending ? '...' : 'Yes'}
+                {t('common.delete').includes('Eliminar') ? 'Sí' : 'Yes'}
               </button>
               <button
                 onClick={() => setShowConfirm(false)}
@@ -141,7 +145,7 @@ export default function HabitCard({ habit, completed, onEdit }: HabitCardProps) 
             <button
               onClick={() => setShowConfirm(true)}
               className="p-2 rounded-lg text-app-muted transition-all duration-150 hover:scale-110 active:scale-90"
-              aria-label="Delete habit"
+              title={t('common.delete')}
             >
               🗑️
             </button>

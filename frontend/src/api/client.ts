@@ -9,12 +9,20 @@ export const apiClient = axios.create({
   },
 });
 
-// Request interceptor to add auth token
+// Request interceptor to add auth token and dynamic timezone
 apiClient.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
+    // Auth token
     const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    // Dynamic Timezone
+    if (config.headers.set) {
+      config.headers.set('X-Timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
+    } else {
+      config.headers['X-Timezone'] = Intl.DateTimeFormat().resolvedOptions().timeZone;
     }
   }
   return config;

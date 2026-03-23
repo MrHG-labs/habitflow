@@ -47,10 +47,10 @@ def toggle_complete(
 
 
 def get_today_progress(
-    session: Session, user_id: int, habit_ids: list[int]
+    session: Session, user_id: int, habit_ids: list[int], target_date: date
 ) -> dict[int, bool]:
     """Return a dict of {habit_id: completed} for today."""
-    today = date.today()
+    today = target_date
     rows = session.exec(
         select(HabitProgress).where(
             HabitProgress.user_id == user_id,
@@ -64,13 +64,13 @@ def get_today_progress(
     return result
 
 
-def calculate_streak(session: Session, habit_id: int, user_id: int) -> int:
+def calculate_streak(session: Session, habit_id: int, user_id: int, target_date: date) -> int:
     """
     Calculate the consecutive-days streak for a habit up to today.
     Walks backwards day by day from today. Stops as soon as a day is missing
     or not completed.
     """
-    today = date.today()
+    today = target_date
     streak = 0
     current = today
 
@@ -93,13 +93,13 @@ def calculate_streak(session: Session, habit_id: int, user_id: int) -> int:
 
 
 def get_weekly_completions(
-    session: Session, user_id: int
+    session: Session, user_id: int, target_date: date
 ) -> list[dict]:
     """
     Return daily completion counts for the last 7 days (for dashboard).
     Returns list of {date: str, completed: int}.
     """
-    today = date.today()
+    today = target_date
     result = []
     for i in range(6, -1, -1):
         day = today - timedelta(days=i)
