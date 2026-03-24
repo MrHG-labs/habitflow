@@ -57,8 +57,12 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
     >
       {/* 5.2 Sheet on mobile, centered modal on sm+ */}
       <div
-        className="card w-full sm:max-w-md p-6 rounded-t-2xl sm:rounded-2xl shadow-2xl animate-in fade-in slide-in-from-bottom-5 duration-300"
-        style={{ maxHeight: '90vh', overflowY: 'auto' }}
+        className="card w-full sm:max-w-md p-6 rounded-t-2xl sm:rounded-2xl shadow-2xl"
+        style={{
+          maxHeight: '90vh',
+          overflowY: 'auto',
+          animation: 'modalSlideIn 0.3s ease-out',
+        }}
       >
         {/* Handle bar (mobile) */}
         <div className="flex justify-center mb-4 sm:hidden">

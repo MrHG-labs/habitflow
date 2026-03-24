@@ -13,11 +13,13 @@ interface XpPopupProps {
  */
 export default function XpPopup({ xpGained, trigger }: XpPopupProps) {
   const [visible, setVisible] = useState(false);
+  const [key, setKey] = useState(0);
 
   useEffect(() => {
     if (trigger === 0) return;
     setVisible(true);
-    const timeout = setTimeout(() => setVisible(false), 1200);
+    setKey((k) => k + 1);
+    const timeout = setTimeout(() => setVisible(false), 1500);
     return () => clearTimeout(timeout);
   }, [trigger]);
 
@@ -25,8 +27,15 @@ export default function XpPopup({ xpGained, trigger }: XpPopupProps) {
 
   return (
     <span
-      className="pointer-events-none absolute -top-4 right-1 text-sm font-bold text-green-600 animate-bounce"
-      style={{ animation: 'xpFloat 1.2s ease-out forwards' }}
+      key={key}
+      className="pointer-events-none absolute -top-5 -right-2 text-sm font-bold whitespace-nowrap"
+      style={{
+        animation: 'xpFloat 1.5s ease-out forwards',
+        background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        filter: 'drop-shadow(0 2px 4px rgba(34, 197, 94, 0.3))',
+      }}
     >
       +{xpGained} XP
     </span>

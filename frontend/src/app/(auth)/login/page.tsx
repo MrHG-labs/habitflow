@@ -13,11 +13,22 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const [mounted, setMounted] = useState(false);
+
   // Clear errors and check auth on mount
   useEffect(() => {
+    setMounted(true);
     clearError();
     checkAuth();
   }, [clearError, checkAuth]);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 transition-all duration-700" style={{ background: 'linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%)' }}>
+         <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,7 +92,8 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-5 py-3.5 rounded-2xl text-app-primary text-sm
-                         focus:outline-none focus:ring-4 ring-indigo-500/10 transition-all duration-300"
+                         focus:outline-none focus:ring-4 ring-indigo-500/10 transition-all duration-300
+                         focus:scale-[1.01] placeholder:transition-opacity"
               style={{
                 backgroundColor: 'var(--bg-app)',
                 border: '1px solid var(--border)',
@@ -101,7 +113,8 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full px-5 py-3.5 rounded-2xl text-app-primary text-sm
-                         focus:outline-none focus:ring-4 ring-indigo-500/10 transition-all duration-300"
+                         focus:outline-none focus:ring-4 ring-indigo-500/10 transition-all duration-300
+                         focus:scale-[1.01] placeholder:transition-opacity"
               style={{
                 backgroundColor: 'var(--bg-app)',
                 border: '1px solid var(--border)',

@@ -17,11 +17,22 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [validationError, setValidationError] = useState('');
 
+  const [mounted, setMounted] = useState(false);
+
   // Clear errors and check auth on mount
   useEffect(() => {
+    setMounted(true);
     clearError();
     checkAuth();
   }, [clearError, checkAuth]);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 transition-all duration-700" style={{ background: 'linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%)' }}>
+         <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
