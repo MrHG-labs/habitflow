@@ -100,3 +100,14 @@ def get_weekly(
     """Get daily completion counts for the last 7 days (for dashboard)."""
     local_today = date_type.fromisoformat(get_today_user(tz))
     return progress_service.get_weekly_completions(session, current_user.id, local_today)
+
+
+@router.get("/analytics", response_model=dict)
+def get_analytics(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+    tz: str = Depends(get_user_timezone),
+):
+    """Get advanced analytics for the user."""
+    local_today = date_type.fromisoformat(get_today_user(tz))
+    return progress_service.get_advanced_analytics(session, current_user.id, local_today)

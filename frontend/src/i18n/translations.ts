@@ -14,6 +14,7 @@ export const translations = {
       habits: 'Hábitos',
       dashboard: 'Panel',
       exportData: 'Exportar Datos',
+      analytics: 'Estadísticas',
     },
     auth: {
       login: 'Iniciar sesión',
@@ -80,6 +81,15 @@ export const translations = {
       permissionBanner: 'Permite notificaciones para recibir recordatorios de tus hábitos',
       dismiss: 'Ahora no',
     },
+    analytics: {
+      title: 'Visión General',
+      subtitle: 'Analiza tu consistencia e identifica áreas de mejora',
+      heatmap: 'Actividad del último año',
+      heatmapEmpty: 'No hay actividad completada en el último año.',
+      categories: 'Distribución por Categorías',
+      daysOfWeek: 'Rendimiento por Día (Últimos 90 días)',
+      days: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
+    },
     gamification: {
       levelUp: '¡NIVEL {level}!',
       congrats: '¡Felicidades! Has alcanzado un nuevo nivel.',
@@ -110,6 +120,7 @@ export const translations = {
       habits: 'Habits',
       dashboard: 'Dashboard',
       exportData: 'Export Data',
+      analytics: 'Analytics',
     },
     auth: {
       login: 'Login',
@@ -175,6 +186,15 @@ export const translations = {
       permissionRequest: 'Enable notifications',
       permissionBanner: 'Allow notifications to receive habit reminders',
       dismiss: 'Not now',
+    },
+    analytics: {
+      title: 'Overview',
+      subtitle: 'Analyze your consistency and identify areas for improvement',
+      heatmap: 'Activity over the last year',
+      heatmapEmpty: 'No completed activity in the past year.',
+      categories: 'Category Distribution',
+      daysOfWeek: 'Performance by Day (Last 90 days)',
+      days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     },
     gamification: {
       levelUp: 'LEVEL {level}!',

@@ -64,6 +64,7 @@ export default function DashboardLayout({
   const navLinks = [
     { label: t('common.dashboard'), href: '/dashboard' },
     { label: t('common.habits'), href: '/habits' },
+    { label: t('common.analytics'), href: '/analytics' },
   ];
 
   return (
