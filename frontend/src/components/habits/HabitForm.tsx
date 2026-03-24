@@ -176,7 +176,10 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
               style={{ backgroundColor: 'var(--bg-app)', border: '1px solid var(--border)' }}
             >
               <option value="daily">{t('habits.daily')}</option>
+              <option value="every_other_day">{t('habits.every_other_day')}</option>
               <option value="weekly">{t('habits.weekly')}</option>
+              <option value="biweekly">{t('habits.biweekly')}</option>
+              <option value="monthly">{t('habits.monthly')}</option>
             </select>
           </div>
 

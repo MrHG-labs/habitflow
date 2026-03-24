@@ -68,27 +68,53 @@ def get_today_progress(
 def calculate_streak(session: Session, habit_id: int, user_id: int, target_date: date) -> int:
     """
     Calculate the consecutive-days streak for a habit up to today.
-    Walks backwards day by day from today. Stops as soon as a day is missing
-    or not completed.
+    Uses interval gaps to support flexible frequencies (every_other_day, weekly, etc).
     """
-    today = target_date
+    habit = session.get(Habit, habit_id)
+    if not habit:
+        return 0
+
+    freq_map = {
+        "daily": 1,
+        "every_other_day": 2,
+        "weekly": 7,
+        "biweekly": 14,
+        "monthly": 31
+    }
+    max_gap = freq_map.get(habit.frequency, 1)
+
+    completed_progress = session.exec(
+        select(HabitProgress)
+        .where(
+            HabitProgress.habit_id == habit_id,
+            HabitProgress.user_id == user_id,
+            HabitProgress.completed == True,  # noqa: E712
+            HabitProgress.date <= target_date
+        )
+        .order_by(HabitProgress.date.desc())
+    ).all()
+
+    if not completed_progress:
+        return 0
+
+    # Check if the streak is already broken up to target_date
+    days_since_last = (target_date - completed_progress[0].date).days
+    if days_since_last > max_gap:
+        return 0
+
     streak = 0
-    current = today
-
-    while True:
-        progress = session.exec(
-            select(HabitProgress).where(
-                HabitProgress.habit_id == habit_id,
-                HabitProgress.user_id == user_id,
-                HabitProgress.date == current,
-            )
-        ).first()
-
-        if progress and progress.completed:
-            streak += 1
-            current -= timedelta(days=1)
+    last_date = None
+    for p in completed_progress:
+        if last_date is None:
+            streak = 1
+            last_date = p.date
         else:
-            break
+            gap = (last_date - p.date).days
+            if gap <= max_gap:
+                streak += 1
+                last_date = p.date
+            else:
+                break
 
     return streak
 
