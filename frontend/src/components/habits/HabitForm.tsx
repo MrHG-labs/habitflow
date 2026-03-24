@@ -31,6 +31,8 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
   const [color, setColor] = useState('#6366f1');
   const [frequency, setFrequency] = useState('daily');
   const [category, setCategory] = useState('personal');
+  const [reminderEnabled, setReminderEnabled] = useState(false);
+  const [reminderTime, setReminderTime] = useState('08:00');
 
   const isEditing = !!habit;
 
@@ -42,16 +44,19 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
       setColor(habit.color);
       setFrequency(habit.frequency);
       setCategory(habit.category || 'personal');
+      setReminderEnabled(!!habit.reminder_time);
+      setReminderTime(habit.reminder_time || '08:00');
     }
   }, [habit]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const reminder = reminderEnabled ? reminderTime : null;
     if (isEditing && habit) {
-      const data: HabitUpdate = { name, description: description || null, icon, color, frequency, category };
+      const data: HabitUpdate = { name, description: description || null, icon, color, frequency, category, reminder_time: reminder };
       updateHabit.mutate({ id: habit.id, data }, { onSuccess: onClose });
     } else {
-      const data: HabitCreate = { name, description: description || null, icon, color, frequency, category };
+      const data: HabitCreate = { name, description: description || null, icon, color, frequency, category, reminder_time: reminder };
       createHabit.mutate(data, { onSuccess: onClose });
     }
   };
@@ -201,6 +206,59 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
                 );
               })}
             </div>
+          </div>
+
+          {/* Reminder */}
+          <div
+            className="rounded-xl p-4 space-y-3"
+            style={{ backgroundColor: 'var(--bg-app)', border: '1px solid var(--border)' }}
+          >
+            {/* Toggle row */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🔔</span>
+                <span className="text-sm font-semibold text-app-primary">{t('reminders.enable')}</span>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={reminderEnabled}
+                onClick={() => setReminderEnabled((v) => !v)}
+                className="relative w-11 h-6 rounded-full transition-all duration-300 focus:outline-none"
+                style={{
+                  backgroundColor: reminderEnabled ? 'var(--accent)' : 'var(--border)',
+                }}
+              >
+                <span
+                  className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-300"
+                  style={{ transform: reminderEnabled ? 'translateX(20px)' : 'translateX(0)' }}
+                />
+              </button>
+            </div>
+
+            {/* Time picker — visible when enabled */}
+            {reminderEnabled && (
+              <div
+                className="space-y-1"
+                style={{ animation: 'fadeIn 0.2s ease-out' }}
+              >
+                <label htmlFor="reminder-time" className="block text-xs font-medium text-app-secondary px-0.5">
+                  {t('reminders.time')}
+                </label>
+                <input
+                  id="reminder-time"
+                  type="time"
+                  value={reminderTime}
+                  onChange={(e) => setReminderTime(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl text-app-primary text-sm focus:outline-none focus:ring-2 ring-indigo-500/20 transition-all"
+                  style={{
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border)',
+                    colorScheme: 'auto',
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           {/* Actions */}

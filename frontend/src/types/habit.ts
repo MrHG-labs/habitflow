@@ -7,6 +7,7 @@ export interface Habit {
   color: string;
   frequency: string;
   category: string;
+  reminder_time: string | null;
   order: number;
   created_at: string;
 }
@@ -18,6 +19,7 @@ export interface HabitCreate {
   color?: string;
   frequency?: string;
   category?: string;
+  reminder_time?: string | null;
 }
 
 export interface HabitUpdate {
@@ -27,5 +29,6 @@ export interface HabitUpdate {
   color?: string;
   frequency?: string;
   category?: string;
+  reminder_time?: string | null;
   order?: number;
 }

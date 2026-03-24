@@ -27,6 +27,7 @@ def get_habits(
             color=h.color,
             frequency=h.frequency,
             category=h.category,
+            reminder_time=h.reminder_time,
             order=h.order,
             created_at=h.created_at.isoformat(),
         )
@@ -51,6 +52,7 @@ def create_habit(
         color=habit.color,
         frequency=habit.frequency,
         category=habit.category,
+        reminder_time=habit.reminder_time,
         order=habit.order,
         created_at=habit.created_at.isoformat(),
     )
@@ -81,6 +83,7 @@ def update_habit(
         color=updated.color,
         frequency=updated.frequency,
         category=updated.category,
+        reminder_time=updated.reminder_time,
         order=updated.order,
         created_at=updated.created_at.isoformat(),
     )

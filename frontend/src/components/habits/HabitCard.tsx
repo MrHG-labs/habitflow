@@ -156,6 +156,16 @@ export default function HabitCard({ habit, completed, onEdit, index = 0 }: Habit
                 </span>
               );
             })()}
+            {habit.reminder_time && (
+              <span
+                className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium"
+                style={{ backgroundColor: 'var(--accent-light)', color: 'var(--accent)' }}
+                title={t('reminders.time')}
+              >
+                <span className="text-[10px]">🔔</span>
+                {habit.reminder_time}
+              </span>
+            )}
           </div>
         </div>
 

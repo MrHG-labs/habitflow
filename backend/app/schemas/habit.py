@@ -9,6 +9,7 @@ class HabitBase(BaseModel):
     color: str = "#6366f1"
     frequency: str = "daily"
     category: str = "personal"
+    reminder_time: str | None = None
 
 
 class HabitCreate(HabitBase):
@@ -24,6 +25,7 @@ class HabitUpdate(BaseModel):
     color: str | None = None
     frequency: str | None = None
     category: str | None = None
+    reminder_time: str | None = None
     order: int | None = None
 
 

@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { useThemeStore } from '@/stores/themeStore';
 import { useI18nStore } from '@/stores/i18nStore';
 import LevelBadge from '@/components/dashboard/LevelBadge';
+import RemindersController from '@/components/habits/RemindersController';
 
 export default function DashboardLayout({
   children,
@@ -156,6 +157,9 @@ export default function DashboardLayout({
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {children}
       </main>
+
+      {/* Global generic reminders controller and popup */}
+      <RemindersController />
     </div>
   );
 }
