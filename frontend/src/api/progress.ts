@@ -12,13 +12,23 @@ export const progressApi = {
     return response.data;
   },
 
-  getStreak: async (habitId: number): Promise<{ habit_id: number; streak: number }> => {
+  getStreak: async (habitId: number): Promise<{ habit_id: number; streak: number; days_neglected: number }> => {
     const response = await apiClient.get(`/progress/${habitId}/streak`);
     return response.data;
   },
 
   getWeekly: async (): Promise<Array<{ date: string; completed: number }>> => {
     const response = await apiClient.get('/progress/weekly');
+    return response.data;
+  },
+  getSummary: async (): Promise<{
+    completed_today: number;
+    total_habits: number;
+    momentum_pct: number;
+    streak_count: number;
+    weekly_progress: Array<{ date: string; completed: number }>;
+  }> => {
+    const response = await apiClient.get('/progress/summary');
     return response.data;
   },
 };

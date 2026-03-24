@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Habit } from '@/types/habit';
 import { useDeleteHabit } from '@/hooks/useHabits';
-import { useToggleHabit } from '@/hooks/useProgress';
+import { useToggleHabit, useHabitStreak } from '@/hooks/useProgress';
 import { useAuthStore } from '@/stores/authStore';
 import { useI18nStore } from '@/stores/i18nStore';
 import StreakBadge from './StreakBadge';
@@ -23,6 +23,9 @@ export default function HabitCard({ habit, completed, onEdit, index = 0 }: Habit
   const deleteHabit = useDeleteHabit();
   const toggleHabit = useToggleHabit();
   const { checkAuth } = useAuthStore();
+  const { data: streakData } = useHabitStreak(habit.id);
+  const neglected = streakData?.days_neglected ?? 0;
+  const isNeglected = neglected >= 3;
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [animating, setAnimating] = useState(false);
@@ -71,11 +74,11 @@ export default function HabitCard({ habit, completed, onEdit, index = 0 }: Habit
   return (
     <>
       <div
-        className={`card relative p-4 flex items-center gap-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg ${
+        className={`card relative p-4 flex items-center gap-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg overflow-hidden ${
           completed ? 'opacity-70' : ''
-        }`}
+        } ${isNeglected && !completed ? 'card-neglected' : ''}`}
         style={{
-          borderLeftColor: habit.color,
+          borderLeftColor: isNeglected && !completed ? '#cbd5e1' : habit.color,
           borderLeftWidth: '4px',
           animationDelay: `${index * 75}ms`,
         }}
@@ -112,16 +115,19 @@ export default function HabitCard({ habit, completed, onEdit, index = 0 }: Habit
         </button>
 
         {/* Icon */}
-        <div className="text-3xl transition-transform duration-200 hover:scale-110">
-          {habit.icon}
+        <div className={`text-3xl transition-transform duration-200 hover:scale-110 ${isNeglected && !completed ? 'grayscale' : ''}`}>
+          {isNeglected && !completed ? '🕸️' : habit.icon}
         </div>
+
+        {isNeglected && !completed && <div className="spiderweb-overlay" />}
 
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h3
               className={`font-semibold truncate transition-all duration-300 ${
-                completed ? 'line-through text-app-muted' : 'text-app-primary'
+                completed ? 'line-through text-app-muted' : 
+                isNeglected ? 'text-neglected' : 'text-app-primary'
               }`}
             >
               {habit.name}

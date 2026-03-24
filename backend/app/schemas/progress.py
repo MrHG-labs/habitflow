@@ -33,4 +33,14 @@ class StreakResponse(BaseModel):
     """Schema for habit streak info."""
     habit_id: int
     streak: int          # consecutive days completed up to today
+    days_neglected: int  # days since last completed (or since creation)
+
+
+class DashboardSummary(BaseModel):
+    """Global dashboard summary metadata."""
+    completed_today: int
+    total_habits: int
+    momentum_pct: int     # 0-100%
+    streak_count: int     # max streak
+    weekly_progress: list[dict]
 

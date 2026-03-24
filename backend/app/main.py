@@ -12,7 +12,7 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
 # Import models so SQLModel registers their tables
-from app.models import user, habit, progress  # noqa: F401
+from app.models import user, habit, progress, achievement, session as user_session  # noqa: F401
 
 
 @asynccontextmanager

@@ -226,3 +226,28 @@ body {
     transform: translateY(0) scale(1);
   }
 }
+@keyframes spiderwebExpand {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 0.15; }
+}
+
+.card-neglected {
+  filter: grayscale(0.7) contrast(0.95);
+  transition: all 0.5s ease-in-out;
+}
+
+.spiderweb-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: 
+    radial-gradient(circle at 10% 10%, transparent 90%, rgba(255,255,255,0.4) 100%),
+    repeating-radial-gradient(circle at 0% 0%, transparent 0, transparent 10px, rgba(0,0,0,0.03) 10px, rgba(0,0,0,0.03) 11px);
+  opacity: 0.15;
+  animation: spiderwebExpand 2s ease-out forwards;
+}
+
+.text-neglected {
+  color: #991b1b !important;
+  text-decoration: none !important;
+}

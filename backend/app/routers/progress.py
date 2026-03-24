@@ -6,13 +6,24 @@ from pydantic import BaseModel
 from app.database import get_session
 from app.dependencies.auth import get_current_user
 from app.models.user import User
-from app.schemas.progress import ToggleResponse, StreakResponse
+from app.schemas.progress import ToggleResponse, StreakResponse, DashboardSummary
 from app.services import auth_service, habit_service, progress_service
 from app.dependencies.timezone import get_user_timezone, get_today_user
 from app.dependencies.rate_limiter import limiter
 from app.utils.websocket import manager
 
 router = APIRouter(prefix="/progress", tags=["Progress"])
+
+
+@router.get("/summary", response_model=DashboardSummary)
+def get_summary(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+    tz: str = Depends(get_user_timezone),
+):
+    """Get all summary info for the dashboard at once."""
+    local_today = date_type.fromisoformat(get_today_user(tz))
+    return progress_service.get_dashboard_summary(session, current_user.id, local_today)
 
 
 @router.post("/{habit_id}/toggle", response_model=ToggleResponse)
@@ -89,8 +100,8 @@ def get_streak(
         )
 
     local_today = date_type.fromisoformat(get_today_user(tz))
-    streak = progress_service.calculate_streak(session, habit_id, current_user.id, local_today)
-    return StreakResponse(habit_id=habit_id, streak=streak)
+    streak_count, days_neglected = progress_service.calculate_streak(session, habit_id, current_user.id, local_today)
+    return StreakResponse(habit_id=habit_id, streak=streak_count, days_neglected=days_neglected)
 
 
 @router.get("/weekly", response_model=list)

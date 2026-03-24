@@ -8,7 +8,7 @@ from sqlmodel import SQLModel
 from alembic import context
 
 # Import your models here to ensure they are registered with SQLModel.metadata
-from app.models import user, habit, progress # noqa
+from app.models import user, habit, progress, achievement, session as user_session # noqa
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

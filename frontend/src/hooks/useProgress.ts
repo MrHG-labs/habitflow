@@ -37,3 +37,10 @@ export function useWeeklyProgress() {
     queryFn: progressApi.getWeekly,
   });
 }
+
+export function useDashboardSummary() {
+  return useQuery({
+    queryKey: ['progress', 'summary'],
+    queryFn: progressApi.getSummary,
+  });
+}

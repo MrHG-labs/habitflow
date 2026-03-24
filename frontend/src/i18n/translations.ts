@@ -47,6 +47,10 @@ export const translations = {
       noData: 'Sin datos aún. ¡Empieza a completar hábitos!',
       totalXp: 'XP Total',
       xpGoal: '¡Sigue completando hábitos para ganar más XP!',
+      momentum: 'Momentum (Energía)',
+      momentumHigh: '¡Estás en racha! Tu energía está al máximo.',
+      momentumMid: 'Vas por buen camino, mantén el ritmo.',
+      momentumLow: 'Tu energía está bajando. ¡Completa un hábito para revivir!',
     },
     habits: {
       title: 'Mis Hábitos',
@@ -66,6 +70,7 @@ export const translations = {
       noHabits: 'No tienes hábitos creados aún.',
       createFirst: '¡Crea tu primer hábito para empezar!',
       category: 'Categoría',
+      lockedMessage: 'Este hábito ha sido verificado por tu consistencia y ya no puede ser editado para mantener la integridad de tus logros. 🔒',
     },
     categories: {
       all: 'Todos',
@@ -171,6 +176,10 @@ export const translations = {
       noData: 'No data yet. Start completing habits!',
       totalXp: 'Total XP',
       xpGoal: 'Keep completing habits to earn more XP!',
+      momentum: 'Momentum (Energy)',
+      momentumHigh: "You're on fire! Your energy is at peak.",
+      momentumMid: "You're doing great, keep up the pace.",
+      momentumLow: 'Your energy is dropping. Complete a habit to revive!',
     },
     habits: {
       title: 'My Habits',
@@ -190,6 +199,7 @@ export const translations = {
       noHabits: 'You have no habits created yet.',
       createFirst: 'Create your first habit to get started!',
       category: 'Category',
+      lockedMessage: 'This habit has been verified by your consistency and can no longer be edited to maintain the integrity of your achievements. 🔒',
     },
     categories: {
       all: 'All',

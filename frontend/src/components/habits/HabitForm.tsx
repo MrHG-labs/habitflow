@@ -35,6 +35,17 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
   const [reminderTime, setReminderTime] = useState('08:00');
 
   const isEditing = !!habit;
+  const [isLocked, setIsLocked] = useState(false);
+
+  useEffect(() => {
+    if (habit) {
+      const createdAt = new Date(habit.created_at);
+      const diffDays = (new Date().getTime() - createdAt.getTime()) / (1000 * 3600 * 24);
+      if (diffDays >= 7) {
+        setIsLocked(true);
+      }
+    }
+  }, [habit]);
 
   useEffect(() => {
     if (habit) {
@@ -96,17 +107,25 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
           </button>
         </div>
 
+        {isLocked && (
+          <div className="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm flex items-start gap-3 animate-fade-in-scale">
+            <span className="text-xl">🔒</span>
+            <p>{t('habits.lockedMessage')}</p>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Name */}
           <div className="space-y-1.5">
             <label htmlFor="habit-name" className="block text-sm font-semibold text-app-secondary px-1">{t('habits.name')}</label>
             <input
-              id="habit-name"
+               id="habit-name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-xl text-app-primary text-sm focus:outline-none focus:ring-2 ring-indigo-500/20 transition-all"
+              disabled={isLocked}
+              className={`w-full px-4 py-3 rounded-xl text-app-primary text-sm focus:outline-none focus:ring-2 ring-indigo-500/20 transition-all ${isLocked ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
               style={{ backgroundColor: 'var(--bg-app)', border: '1px solid var(--border)' }}
               placeholder={t('habits.name')}
             />
@@ -132,10 +151,12 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
             <div className="flex flex-wrap gap-2.5">
               {ICONS.map((i) => (
                 <button
-                  key={i} type="button" onClick={() => setIcon(i)}
+                  key={i} type="button" 
+                  onClick={() => !isLocked && setIcon(i)}
+                  disabled={isLocked}
                   className={`w-11 h-11 rounded-xl text-xl flex items-center justify-center transition-all duration-200 ${
                     icon === i ? 'ring-2 scale-110 shadow-lg' : 'hover:scale-105 opacity-60 hover:opacity-100'
-                  }`}
+                  } ${isLocked ? 'opacity-40 cursor-not-allowed' : ''}`}
                   style={{
                     backgroundColor: icon === i ? 'var(--accent-light)' : 'var(--bg-app)',
                     border: '1px solid var(--border)',
@@ -169,10 +190,11 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
           <div className="space-y-1.5">
             <label htmlFor="habit-frequency" className="block text-sm font-semibold text-app-secondary px-1">{t('habits.frequency')}</label>
             <select
-              id="habit-frequency"
+               id="habit-frequency"
               value={frequency}
               onChange={(e) => setFrequency(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl text-app-primary text-sm focus:outline-none focus:ring-2 ring-indigo-500/20 transition-all appearance-none cursor-pointer"
+              disabled={isLocked}
+              className={`w-full px-4 py-3 rounded-xl text-app-primary text-sm focus:outline-none focus:ring-2 ring-indigo-500/20 transition-all appearance-none ${isLocked ? 'opacity-50 cursor-not-allowed grayscale' : 'cursor-pointer'}`}
               style={{ backgroundColor: 'var(--bg-app)', border: '1px solid var(--border)' }}
             >
               <option value="daily">{t('habits.daily')}</option>
@@ -193,8 +215,9 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
                   <button
                     key={cat.value}
                     type="button"
-                    onClick={() => setCategory(cat.value)}
-                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                    onClick={() => !isLocked && setCategory(cat.value)}
+                    disabled={isLocked}
+                    className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${isLocked ? 'grayscale opacity-50 cursor-not-allowed' : ''}`}
                     style={{
                       backgroundColor: isSelected ? `${cat.color}20` : 'var(--bg-app)',
                       border: `2px solid ${isSelected ? cat.color : 'var(--border)'}`,

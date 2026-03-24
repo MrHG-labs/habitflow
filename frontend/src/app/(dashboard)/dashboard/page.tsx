@@ -3,22 +3,27 @@
 import { useAuthStore } from '@/stores/authStore';
 import { useI18nStore } from '@/stores/i18nStore';
 import { useHabits } from '@/hooks/useHabits';
-import { useTodayProgress, useWeeklyProgress } from '@/hooks/useProgress';
+import { useTodayProgress, useWeeklyProgress, useDashboardSummary } from '@/hooks/useProgress';
 import LevelBadge from '@/components/dashboard/LevelBadge';
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
   const { t, language } = useI18nStore();
   const { data: habits, isLoading: habitsLoading } = useHabits();
+  const { data: summary, isLoading: summaryLoading } = useDashboardSummary();
+  // Falling back to specialized queries if needed, though summary covers most
   const { data: todayProgress } = useTodayProgress();
   const { data: weekly } = useWeeklyProgress();
 
-  const totalHabits = habits?.length ?? 0;
-  const completedToday = todayProgress
+  const totalHabits = summary?.total_habits ?? habits?.length ?? 0;
+  const completedToday = summary?.completed_today ?? (todayProgress
     ? Object.values(todayProgress).filter(Boolean).length
-    : 0;
+    : 0);
   const pct = totalHabits > 0 ? (completedToday / totalHabits) * 100 : 0;
-  const maxWeeklyDay = weekly ? Math.max(...weekly.map((d) => d.completed), 0) : 0;
+  
+  const momentum = summary?.momentum_pct ?? 100;
+  const weeklyData = summary?.weekly_progress ?? weekly;
+  const maxWeeklyDay = weeklyData ? Math.max(...weeklyData.map((d) => d.completed), 0) : 0;
 
   return (
     <div className="space-y-6">
@@ -76,12 +81,47 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Momentum / Energy Section */}
+      <div className="grid grid-cols-1 gap-6 animate-fade-in-up" style={{ animationDelay: '275ms' }}>
+        <div className="card p-6 bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 overflow-hidden relative border-l-4" style={{ borderLeftColor: momentum > 70 ? 'var(--success)' : momentum > 30 ? '#f59e0b' : 'var(--danger)' }}>
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-bold text-app-primary flex items-center gap-2">
+                {momentum > 70 ? '⚡' : momentum > 30 ? '🔋' : '🪫'} {t('dashboard.momentum')}
+              </h3>
+              <p className="text-sm text-app-secondary mt-1">
+                {momentum > 70 ? t('dashboard.momentumHigh') : momentum > 30 ? t('dashboard.momentumMid') : t('dashboard.momentumLow')}
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+               <div className="text-4xl font-black" style={{ color: momentum > 70 ? 'var(--success)' : momentum > 30 ? '#f59e0b' : 'var(--danger)' }}>
+                  {momentum}%
+               </div>
+               <div className="w-32 h-4 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full transition-all duration-1000 ease-out fill-mode-forwards"
+                    style={{ 
+                      width: `${momentum}%`, 
+                      backgroundColor: momentum > 70 ? 'var(--success)' : momentum > 30 ? '#f59e0b' : 'var(--danger)',
+                      boxShadow: `0 0 10px ${momentum > 70 ? 'var(--success)' : momentum > 30 ? '#f59e0b' : 'var(--danger)'}`
+                    }}
+                  />
+               </div>
+            </div>
+          </div>
+          {/* Subtle background icon */}
+          <div className="absolute -bottom-6 -right-6 text-9xl opacity-5 pointer-events-none select-none">
+            {momentum > 70 ? '🔥' : '🧊'}
+          </div>
+        </div>
+      </div>
+
       {/* Weekly chart */}
-      <div className="card p-6 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+      <div className="card p-6 animate-fade-in-up" style={{ animationDelay: '350ms' }}>
         <h3 className="text-base font-semibold text-app-primary mb-4">{t('dashboard.weeklyProgress')}</h3>
-        {weekly && weekly.length > 0 ? (
+        {weeklyData && weeklyData.length > 0 ? (
           <div className="flex items-end gap-2" style={{ height: '120px' }}>
-            {weekly.map((day, index) => {
+            {weeklyData.map((day, index) => {
               const barPct = totalHabits > 0 ? (day.completed / totalHabits) * 100 : 0;
               // Proper local date calculation to avoid UTC drift
               const now = new Date();
