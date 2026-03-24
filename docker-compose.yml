@@ -1,5 +1,26 @@
 services:
-  # ── Backend: FastAPI + SQLModel (SQLite) ──
+  # ── Base de Datos: PostgreSQL ──
+  db:
+    image: postgres:15-alpine
+    container_name: habitflow_db
+    restart: always
+    environment:
+      POSTGRES_USER: habitflow_user
+      POSTGRES_PASSWORD: habitflow_password
+      POSTGRES_DB: habitflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U habitflow_user -d habitflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - habitflow_net
+
+  # ── Backend: FastAPI + SQLModel ──
   backend:
     build:
       context: ./backend
@@ -11,9 +32,12 @@ services:
       - ./backend:/app
       - /app/.venv
     environment:
-      - DATABASE_URL=sqlite:///./habitflow.db
+      - DATABASE_URL=postgresql://habitflow_user:habitflow_password@db:5432/habitflow
       - SECRET_KEY=dev-secret-key-change-in-production
       - ENVIRONMENT=development
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     healthcheck:
@@ -49,3 +73,6 @@ services:
 networks:
   habitflow_net:
     driver: bridge
+
+volumes:
+  postgres_data:
