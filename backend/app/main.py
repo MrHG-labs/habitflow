@@ -7,6 +7,9 @@ from app.database import init_db
 from app.routers import auth, habits
 from app.routers import progress as progress_router
 from app.routers import websocket
+from app.dependencies.rate_limiter import limiter
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 # Import models so SQLModel registers their tables
 from app.models import user, habit, progress  # noqa: F401
@@ -26,13 +29,22 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS middleware - allow all origins for development
-# In production, restrict this to your frontend domain
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# CORS middleware - restrict this to our frontend domains
+allowed_origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+if os.getenv("FRONTEND_URL"):
+    allowed_origins.append(os.getenv("FRONTEND_URL"))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 

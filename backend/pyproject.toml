@@ -18,4 +18,5 @@ dependencies = [
     "sqlmodel==0.0.21",
     "email-validator",
     "uvicorn[standard]==0.32.0",
+    "slowapi>=0.1.9",
 ]

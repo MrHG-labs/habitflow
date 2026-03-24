@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlmodel import Session, select
 
 from app.database import get_session
@@ -10,12 +10,14 @@ from app.schemas.user import UserCreate, UserLogin, UserResponse
 from app.schemas.token import Token, TokenRefresh
 from app.services import auth_service, session_service
 from app.dependencies.auth import get_current_user
+from app.dependencies.rate_limiter import limiter
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-def register(user_data: UserCreate, session: Session = Depends(get_session)):
+@limiter.limit("3/minute")
+def register(request: Request, user_data: UserCreate, session: Session = Depends(get_session)):
     """Register a new user."""
     # Check if user already exists
     existing_user = auth_service.get_user_by_email(session, user_data.email)
@@ -44,7 +46,8 @@ def register(user_data: UserCreate, session: Session = Depends(get_session)):
 
 
 @router.post("/login", response_model=Token)
-def login(credentials: UserLogin, session: Session = Depends(get_session)):
+@limiter.limit("5/minute")
+def login(request: Request, credentials: UserLogin, session: Session = Depends(get_session)):
     """Login user and return tokens."""
     # Find user
     user = auth_service.get_user_by_email(session, credentials.email)

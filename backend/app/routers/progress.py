@@ -1,5 +1,5 @@
 from datetime import date as date_type
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, Request
 from sqlmodel import Session
 from pydantic import BaseModel
 
@@ -9,6 +9,7 @@ from app.models.user import User
 from app.schemas.progress import ToggleResponse, StreakResponse
 from app.services import auth_service, habit_service, progress_service
 from app.dependencies.timezone import get_user_timezone, get_today_user
+from app.dependencies.rate_limiter import limiter
 from app.utils.websocket import manager
 
 router = APIRouter(prefix="/progress", tags=["Progress"])
@@ -124,13 +125,21 @@ class FocusRewardResponse(BaseModel):
     leveled_up: bool
 
 @router.post("/focus/reward", response_model=FocusRewardResponse)
+@limiter.limit("2/minute")
 def focus_reward(
+    request: Request,
     session_data: FocusSession,
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
     tz: str = Depends(get_user_timezone),
 ):
-    """Reward user for completing a focus session (Pomodoro timer). 2 XP per minute."""
+    """Reward user for completing a focus session (Pomodoro timer). Max 120 mins."""
+    if session_data.duration_minutes <= 0 or session_data.duration_minutes > 120:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Limíte de duración de enfoque superado (Mínimo 1 min, Máximo 120 min)"
+        )
+
     xp_delta = session_data.duration_minutes * 2
     
     current_user.xp += xp_delta
