@@ -13,6 +13,7 @@ export const translations = {
       today: 'Hoy',
       habits: 'Hábitos',
       dashboard: 'Panel',
+      exportData: 'Exportar Datos',
     },
     auth: {
       login: 'Iniciar sesión',
@@ -108,6 +109,7 @@ export const translations = {
       today: 'Today',
       habits: 'Habits',
       dashboard: 'Dashboard',
+      exportData: 'Export Data',
     },
     auth: {
       login: 'Login',

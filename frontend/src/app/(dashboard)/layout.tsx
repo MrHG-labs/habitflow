@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { apiClient } from '@/api/client';
 import { useAuthStore } from '@/stores/authStore';
 import { useThemeStore } from '@/stores/themeStore';
 import { useI18nStore } from '@/stores/i18nStore';
@@ -42,6 +43,23 @@ export default function DashboardLayout({
   }
 
   if (!isAuthenticated) return null;
+
+  const handleExport = async () => {
+    try {
+      const { data } = await apiClient.get('/auth/export');
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `habitflow_export_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Failed to export data', err);
+    }
+  };
 
   const navLinks = [
     { label: t('common.dashboard'), href: '/dashboard' },
@@ -103,6 +121,17 @@ export default function DashboardLayout({
                 title={language === 'es' ? 'Switch to English' : 'Cambiar a Español'}
               >
                 {language === 'es' ? 'ES' : 'EN'}
+              </button>
+
+              {/* Export Data */}
+              <button
+                onClick={handleExport}
+                aria-label={t('common.exportData')}
+                className="hidden sm:flex w-9 h-9 rounded-lg items-center justify-center font-bold text-lg transition-all duration-150 hover:scale-110 active:scale-95"
+                style={{ backgroundColor: 'var(--bg-app)', border: '1px solid var(--border)' }}
+                title={t('common.exportData')}
+              >
+                📥
               </button>
 
               {/* 5.1 Dark / Light toggle */}

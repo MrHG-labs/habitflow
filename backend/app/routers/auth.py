@@ -1,9 +1,11 @@
 from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from app.database import get_session
 from app.models.user import User
+from app.models.habit import Habit
+from app.models.progress import HabitProgress
 from app.schemas.user import UserCreate, UserLogin, UserResponse
 from app.schemas.token import Token, TokenRefresh
 from app.services import auth_service, session_service
@@ -146,4 +148,53 @@ def get_me(current_user: User = Depends(get_current_user)):
         level=current_user.level,
         created_at=current_user.created_at.isoformat()
     )
+
+
+@router.get("/export")
+def export_user_data(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)
+):
+    """Export all user data (profile, habits, progress) as JSON."""
+    habits = session.exec(
+        select(Habit).where(Habit.user_id == current_user.id)
+    ).all()
+    
+    progress = session.exec(
+        select(HabitProgress).where(HabitProgress.user_id == current_user.id)
+    ).all()
+
+    return {
+        "user": {
+            "id": current_user.id,
+            "email": current_user.email,
+            "username": current_user.username,
+            "xp": current_user.xp,
+            "level": current_user.level,
+            "created_at": current_user.created_at.isoformat()
+        },
+        "habits": [
+            {
+                "id": h.id,
+                "name": h.name,
+                "description": h.description,
+                "icon": h.icon,
+                "color": h.color,
+                "frequency": h.frequency,
+                "category": h.category,
+                "reminder_time": h.reminder_time,
+                "order": h.order,
+                "created_at": h.created_at.isoformat()
+            } for h in habits
+        ],
+        "progress": [
+            {
+                "id": p.id,
+                "habit_id": p.habit_id,
+                "completed": p.completed,
+                "date": p.date.isoformat(),
+                "completed_at": p.completed_at.isoformat() if p.completed_at else None
+            } for p in progress
+        ]
+    }
 
