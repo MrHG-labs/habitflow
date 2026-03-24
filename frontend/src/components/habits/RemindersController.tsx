@@ -2,6 +2,7 @@
 
 import { useHabits } from '@/hooks/useHabits';
 import { useReminders } from '@/hooks/useReminders';
+import { useWebSocketSync } from '@/hooks/useWebSocketSync';
 import ReminderPermissionBanner from './ReminderPermissionBanner';
 
 /**
@@ -17,7 +18,10 @@ export default function RemindersController() {
   // 1. Setup recurring notifications
   useReminders(habits);
 
-  // 2. Determine if permission banner should be shown
+  // 2. Setup real-time websocket sync
+  useWebSocketSync();
+
+  // 3. Determine if permission banner should be shown
   const hasReminders = Boolean(habits?.some(h => h.reminder_time));
 
   return (

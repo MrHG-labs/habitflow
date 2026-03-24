@@ -1,5 +1,5 @@
 from datetime import date as date_type
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlmodel import Session
 
 from app.database import get_session
@@ -8,6 +8,7 @@ from app.models.user import User
 from app.schemas.progress import ToggleResponse, StreakResponse
 from app.services import auth_service, habit_service, progress_service
 from app.dependencies.timezone import get_user_timezone, get_today_user
+from app.utils.websocket import manager
 
 router = APIRouter(prefix="/progress", tags=["Progress"])
 
@@ -15,6 +16,7 @@ router = APIRouter(prefix="/progress", tags=["Progress"])
 @router.post("/{habit_id}/toggle", response_model=ToggleResponse)
 def toggle_habit(
     habit_id: int,
+    background_tasks: BackgroundTasks,
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
     tz: str = Depends(get_user_timezone),
@@ -37,6 +39,8 @@ def toggle_habit(
         session, current_user, progress.completed
     )
     xp_delta = auth_service.XP_PER_HABIT if progress.completed else -auth_service.XP_PER_HABIT
+
+    background_tasks.add_task(manager.broadcast_to_user, current_user.id, {"type": "invalidate_habits"})
 
     return ToggleResponse(
         id=progress.id,

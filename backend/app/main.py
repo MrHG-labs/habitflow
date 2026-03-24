@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import init_db
 from app.routers import auth, habits
 from app.routers import progress as progress_router
+from app.routers import websocket
 
 # Import models so SQLModel registers their tables
 from app.models import user, habit, progress  # noqa: F401
@@ -39,7 +40,7 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/api")
 app.include_router(habits.router, prefix="/api")
 app.include_router(progress_router.router, prefix="/api")
-
+app.include_router(websocket.router, prefix="/api")
 
 @app.get("/health")
 def health_check():

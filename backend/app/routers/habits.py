@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlmodel import Session
 
 from app.database import get_session
@@ -6,6 +6,7 @@ from app.dependencies.auth import get_current_user
 from app.models.user import User
 from app.schemas.habit import HabitCreate, HabitUpdate, HabitResponse
 from app.services import habit_service
+from app.utils.websocket import manager
 
 router = APIRouter(prefix="/habits", tags=["Habits"])
 
@@ -38,11 +39,13 @@ def get_habits(
 @router.post("/", response_model=HabitResponse, status_code=status.HTTP_201_CREATED)
 def create_habit(
     data: HabitCreate,
+    background_tasks: BackgroundTasks,
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
     """Create a new habit."""
     habit = habit_service.create_habit(session, current_user.id, data)
+    background_tasks.add_task(manager.broadcast_to_user, current_user.id, {"type": "invalidate_habits"})
     return HabitResponse(
         id=habit.id,
         user_id=habit.user_id,
@@ -62,6 +65,7 @@ def create_habit(
 def update_habit(
     habit_id: int,
     data: HabitUpdate,
+    background_tasks: BackgroundTasks,
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
@@ -74,6 +78,7 @@ def update_habit(
         )
 
     updated = habit_service.update_habit(session, habit, data)
+    background_tasks.add_task(manager.broadcast_to_user, current_user.id, {"type": "invalidate_habits"})
     return HabitResponse(
         id=updated.id,
         user_id=updated.user_id,
@@ -92,6 +97,7 @@ def update_habit(
 @router.delete("/{habit_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_habit(
     habit_id: int,
+    background_tasks: BackgroundTasks,
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
@@ -104,3 +110,4 @@ def delete_habit(
         )
 
     habit_service.delete_habit(session, habit)
+    background_tasks.add_task(manager.broadcast_to_user, current_user.id, {"type": "invalidate_habits"})
