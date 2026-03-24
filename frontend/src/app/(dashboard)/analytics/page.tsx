@@ -17,9 +17,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 export default function AnalyticsPage() {
   const { data, isLoading } = useAnalytics();
-  const { t } = useI18nStore();
-
-  const daysLabel = t('analytics.days') as unknown as string[];
+  const { t, language } = useI18nStore();
 
   // 1. Process category data with colors and translations
   const categoryData = useMemo(() => {
@@ -29,16 +27,16 @@ export default function AnalyticsPage() {
       value: c.value,
       color: CATEGORY_COLORS[c.category] || '#6b7280',
     }));
-  }, [data, t]);
+  }, [data, t, language]);
 
   // 2. Process days of week data
   const dowData = useMemo(() => {
     if (!data?.days_of_week) return [];
     return data.days_of_week.map((d) => ({
-      name: daysLabel[d.day] || d.day.toString(),
+      name: t(`analytics.days.${d.day}`),
       count: d.count,
     }));
-  }, [data, daysLabel]);
+  }, [data, t, language]);
 
   // 3. Process heatmap data
   // Build a fast UI grid dynamically
@@ -46,7 +44,7 @@ export default function AnalyticsPage() {
     if (!data?.heatmap) return { grid: [], maxCount: 0 };
     const countsMap = new Map<string, number>();
     let max = 0;
-    
+
     data.heatmap.forEach(h => {
       countsMap.set(h.date, h.count);
       if (h.count > max) max = h.count;
@@ -65,7 +63,7 @@ export default function AnalyticsPage() {
     currentDay.setDate(currentDay.getDate() - (currentDayOfWeek - 1));
 
     let currentWeek: { date: Date; dateStr: string; count: number }[] = [];
-    
+
     // We recreate the grid until today
     while (currentDay <= today) {
       if (currentDay.getDay() === 1 && currentWeek.length > 0) {
@@ -120,28 +118,28 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* 1. Heatmap (Spans full width on large screens) */}
-        <div 
+        <div
           className="card p-6 rounded-2xl shadow-sm lg:col-span-2 overflow-hidden overflow-x-auto"
           style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)' }}
         >
           <h2 className="text-lg font-bold text-app-primary mb-4">{t('analytics.heatmap')}</h2>
-          
+
           {heatmapGrid.maxCount === 0 && data?.heatmap.length === 0 ? (
             <p className="text-app-muted text-sm italic py-4">{t('analytics.heatmapEmpty')}</p>
           ) : (
-            <div className="min-w-max">
-              <div className="flex gap-1">
+            <div className="min-w-max sm:min-w-0 w-full">
+              <div className="grid grid-cols-[repeat(20,minmax(0,1fr))] sm:flex sm:flex-row sm:flex-nowrap gap-[3px] sm:gap-[3px] w-full">
                 {heatmapGrid.grid.map((week, i) => (
-                  <div key={i} className="flex flex-col gap-1">
+                  <div key={i} className="contents sm:flex sm:flex-col sm:gap-[3px]">
                     {/* Fill empty slots at start of week if it's the first trailing week */}
                     {week.length < 7 && i === 0 && Array.from({ length: 7 - week.length }).map((_, ei) => (
-                      <div key={`e-${ei}`} className="w-3 h-3 rounded-sm opacity-0" />
+                      <div key={`e-${ei}`} className="w-full aspect-square sm:aspect-auto sm:w-3 sm:h-3 rounded-[2px] opacity-0" />
                     ))}
-                    
+
                     {week.map((day) => (
                       <div
                         key={day.dateStr}
-                        className="w-3 h-3 rounded-sm transition-transform hover:scale-125 hover:z-10"
+                        className="w-full aspect-square sm:aspect-auto sm:w-3 sm:h-3 flex-shrink-0 rounded-[2px] transition-transform hover:scale-125 hover:z-10"
                         title={`${day.dateStr}: ${day.count} hábitos`}
                         style={{
                           backgroundColor: getHeatmapColor(day.count, heatmapGrid.maxCount),
@@ -152,7 +150,7 @@ export default function AnalyticsPage() {
 
                     {/* Fill empty slots at end of week if it's the last trailing week */}
                     {week.length < 7 && i === heatmapGrid.grid.length - 1 && Array.from({ length: 7 - week.length }).map((_, ei) => (
-                      <div key={`d-${ei}`} className="w-3 h-3 rounded-sm opacity-0" />
+                      <div key={`d-${ei}`} className="w-full aspect-square sm:aspect-auto sm:w-3 sm:h-3 rounded-[2px] opacity-0" />
                     ))}
                   </div>
                 ))}
@@ -162,12 +160,12 @@ export default function AnalyticsPage() {
         </div>
 
         {/* 2. Category Pie Chart */}
-        <div 
+        <div
           className="card p-6 rounded-2xl shadow-sm flex flex-col items-center"
           style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)' }}
         >
           <h2 className="text-lg font-bold text-app-primary mb-2 self-start">{t('analytics.categories')}</h2>
-          
+
           <div className="w-full h-64 mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -184,7 +182,7 @@ export default function AnalyticsPage() {
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <RechartsTooltip 
+                <RechartsTooltip
                   contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px' }}
                   itemStyle={{ fontWeight: 600 }}
                 />
@@ -203,30 +201,30 @@ export default function AnalyticsPage() {
         </div>
 
         {/* 3. Days of the week Bar Chart */}
-        <div 
+        <div
           className="card p-6 rounded-2xl shadow-sm flex flex-col"
           style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)' }}
         >
           <h2 className="text-lg font-bold text-app-primary mb-4">{t('analytics.daysOfWeek')}</h2>
-          
+
           <div className="w-full h-64 mt-4 -ml-4">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={dowData}>
-                <XAxis 
-                  dataKey="name" 
-                  tick={{ fontSize: 12, fill: 'var(--text-muted)' }} 
-                  axisLine={false} 
+                <XAxis
+                  dataKey="name"
+                  tick={{ fontSize: 12, fill: 'var(--text-muted)' }}
+                  axisLine={false}
                   tickLine={false}
                   tickFormatter={(val: string) => val.substring(0, 3)} // e.g. "Mon"
                 />
                 <YAxis hide />
-                <RechartsTooltip 
+                <RechartsTooltip
                   cursor={{ fill: 'var(--bg-app)', opacity: 0.5 }}
                   contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px' }}
                 />
-                <Bar 
-                  dataKey="count" 
-                  fill="var(--accent)" 
+                <Bar
+                  dataKey="count"
+                  fill="var(--accent)"
                   radius={[6, 6, 6, 6]}
                   name="Hábitos"
                 />
