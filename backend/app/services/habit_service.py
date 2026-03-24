@@ -25,6 +25,7 @@ def create_habit(session: Session, user_id: int, data: HabitCreate) -> Habit:
         icon=data.icon,
         color=data.color,
         frequency=data.frequency,
+        category=data.category,
     )
     session.add(habit)
     session.commit()

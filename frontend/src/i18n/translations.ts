@@ -59,6 +59,14 @@ export const translations = {
       streak: 'racha',
       noHabits: 'No tienes hábitos creados aún.',
       createFirst: '¡Crea tu primer hábito para empezar!',
+      category: 'Categoría',
+    },
+    categories: {
+      all: 'Todos',
+      health: 'Salud',
+      work: 'Trabajo',
+      personal: 'Personal',
+      other: 'Otro',
     },
     gamification: {
       levelUp: '¡NIVEL {level}!',
@@ -135,6 +143,14 @@ export const translations = {
       streak: 'streak',
       noHabits: 'You have no habits created yet.',
       createFirst: 'Create your first habit to get started!',
+      category: 'Category',
+    },
+    categories: {
+      all: 'All',
+      health: 'Health',
+      work: 'Work',
+      personal: 'Personal',
+      other: 'Other',
     },
     gamification: {
       levelUp: 'LEVEL {level}!',

@@ -13,6 +13,13 @@ interface HabitFormProps {
 const ICONS = ['📌', '💪', '📚', '💧', '🧘', '🏃', '🎯', '✍️', '🎵', '💤'];
 const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#eab308', '#22c55e', '#14b8a6', '#3b82f6', '#6b7280'];
 
+const CATEGORIES = [
+  { value: 'health', icon: '💪', labelKey: 'categories.health', color: '#22c55e' },
+  { value: 'work',   icon: '💼', labelKey: 'categories.work',   color: '#3b82f6' },
+  { value: 'personal', icon: '💫', labelKey: 'categories.personal', color: '#8b5cf6' },
+  { value: 'other', icon: '✨', labelKey: 'categories.other', color: '#f97316' },
+];
+
 export default function HabitForm({ habit, onClose }: HabitFormProps) {
   const { t } = useI18nStore();
   const createHabit = useCreateHabit();
@@ -23,6 +30,7 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
   const [icon, setIcon] = useState('📌');
   const [color, setColor] = useState('#6366f1');
   const [frequency, setFrequency] = useState('daily');
+  const [category, setCategory] = useState('personal');
 
   const isEditing = !!habit;
 
@@ -33,16 +41,17 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
       setIcon(habit.icon);
       setColor(habit.color);
       setFrequency(habit.frequency);
+      setCategory(habit.category || 'personal');
     }
   }, [habit]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isEditing && habit) {
-      const data: HabitUpdate = { name, description: description || null, icon, color, frequency };
+      const data: HabitUpdate = { name, description: description || null, icon, color, frequency, category };
       updateHabit.mutate({ id: habit.id, data }, { onSuccess: onClose });
     } else {
-      const data: HabitCreate = { name, description: description || null, icon, color, frequency };
+      const data: HabitCreate = { name, description: description || null, icon, color, frequency, category };
       createHabit.mutate(data, { onSuccess: onClose });
     }
   };
@@ -164,6 +173,34 @@ export default function HabitForm({ habit, onClose }: HabitFormProps) {
               <option value="daily">{t('habits.daily')}</option>
               <option value="weekly">{t('habits.weekly')}</option>
             </select>
+          </div>
+
+          {/* Category */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-app-secondary px-1">{t('habits.category')}</label>
+            <div className="grid grid-cols-2 gap-2">
+              {CATEGORIES.map((cat) => {
+                const isSelected = category === cat.value;
+                return (
+                  <button
+                    key={cat.value}
+                    type="button"
+                    onClick={() => setCategory(cat.value)}
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                    style={{
+                      backgroundColor: isSelected ? `${cat.color}20` : 'var(--bg-app)',
+                      border: `2px solid ${isSelected ? cat.color : 'var(--border)'}`,
+                      color: isSelected ? cat.color : 'var(--text-muted)',
+                      transform: isSelected ? 'scale(1.03)' : 'scale(1)',
+                      boxShadow: isSelected ? `0 0 0 3px ${cat.color}18` : 'none',
+                    }}
+                  >
+                    <span className="text-base">{cat.icon}</span>
+                    <span>{t(cat.labelKey)}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Actions */}

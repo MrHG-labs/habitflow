@@ -6,6 +6,7 @@ export interface Habit {
   icon: string;
   color: string;
   frequency: string;
+  category: string;
   order: number;
   created_at: string;
 }
@@ -16,6 +17,7 @@ export interface HabitCreate {
   icon?: string;
   color?: string;
   frequency?: string;
+  category?: string;
 }
 
 export interface HabitUpdate {
@@ -24,5 +26,6 @@ export interface HabitUpdate {
   icon?: string;
   color?: string;
   frequency?: string;
+  category?: string;
   order?: number;
 }

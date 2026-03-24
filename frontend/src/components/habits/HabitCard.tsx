@@ -131,13 +131,34 @@ export default function HabitCard({ habit, completed, onEdit, index = 0 }: Habit
           {habit.description && (
             <p className="text-sm text-app-secondary truncate">{habit.description}</p>
           )}
-          <span
-            className="inline-block mt-1 text-xs px-2 py-0.5 rounded-full transition-colors duration-200 hover:bg-opacity-80"
-            style={{ backgroundColor: 'var(--bg-app)', color: 'var(--text-muted)' }}
-          >
-            {translatedFreq}
-          </span>
+          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+            <span
+              className="inline-block text-xs px-2 py-0.5 rounded-full transition-colors duration-200"
+              style={{ backgroundColor: 'var(--bg-app)', color: 'var(--text-muted)' }}
+            >
+              {translatedFreq}
+            </span>
+            {habit.category && (() => {
+              const catMeta: Record<string, { icon: string; color: string }> = {
+                health:   { icon: '💪', color: '#22c55e' },
+                work:     { icon: '💼', color: '#3b82f6' },
+                personal: { icon: '💫', color: '#8b5cf6' },
+                other:    { icon: '✨', color: '#f97316' },
+              };
+              const meta = catMeta[habit.category] ?? { icon: '📂', color: 'var(--text-muted)' };
+              return (
+                <span
+                  className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium"
+                  style={{ backgroundColor: `${meta.color}15`, color: meta.color }}
+                >
+                  <span className="text-[10px]">{meta.icon}</span>
+                  {t(`categories.${habit.category}`)}
+                </span>
+              );
+            })()}
+          </div>
         </div>
+
 
         {/* Edit / Delete */}
         <div className="flex items-center gap-1 shrink-0">

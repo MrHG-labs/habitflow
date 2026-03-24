@@ -26,6 +26,7 @@ def get_habits(
             icon=h.icon,
             color=h.color,
             frequency=h.frequency,
+            category=h.category,
             order=h.order,
             created_at=h.created_at.isoformat(),
         )
@@ -49,6 +50,7 @@ def create_habit(
         icon=habit.icon,
         color=habit.color,
         frequency=habit.frequency,
+        category=habit.category,
         order=habit.order,
         created_at=habit.created_at.isoformat(),
     )
@@ -78,6 +80,7 @@ def update_habit(
         icon=updated.icon,
         color=updated.color,
         frequency=updated.frequency,
+        category=updated.category,
         order=updated.order,
         created_at=updated.created_at.isoformat(),
     )

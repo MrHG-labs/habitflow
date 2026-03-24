@@ -8,6 +8,7 @@ class HabitBase(BaseModel):
     icon: str = "📌"
     color: str = "#6366f1"
     frequency: str = "daily"
+    category: str = "personal"
 
 
 class HabitCreate(HabitBase):
@@ -22,6 +23,7 @@ class HabitUpdate(BaseModel):
     icon: str | None = None
     color: str | None = None
     frequency: str | None = None
+    category: str | None = None
     order: int | None = None
 
 
