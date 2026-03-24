@@ -1,6 +1,7 @@
 from datetime import date as date_type
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlmodel import Session
+from pydantic import BaseModel
 
 from app.database import get_session
 from app.dependencies.auth import get_current_user
@@ -111,3 +112,41 @@ def get_analytics(
     """Get advanced analytics for the user."""
     local_today = date_type.fromisoformat(get_today_user(tz))
     return progress_service.get_advanced_analytics(session, current_user.id, local_today)
+
+
+class FocusSession(BaseModel):
+    duration_minutes: int
+
+class FocusRewardResponse(BaseModel):
+    xp_gained: int
+    user_xp: int
+    new_level: int
+    leveled_up: bool
+
+@router.post("/focus/reward", response_model=FocusRewardResponse)
+def focus_reward(
+    session_data: FocusSession,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+    tz: str = Depends(get_user_timezone),
+):
+    """Reward user for completing a focus session (Pomodoro timer). 2 XP per minute."""
+    xp_delta = session_data.duration_minutes * 2
+    
+    current_user.xp += xp_delta
+    # Use existing rule for levels
+    from app.services import auth_service
+    new_level = auth_service.calculate_level(current_user.xp)
+    leveled_up = new_level > current_user.level
+    current_user.level = new_level
+    
+    session.add(current_user)
+    session.commit()
+    session.refresh(current_user)
+    
+    return FocusRewardResponse(
+        xp_gained=xp_delta,
+        leveled_up=leveled_up,
+        user_xp=current_user.xp,
+        new_level=current_user.level
+    )

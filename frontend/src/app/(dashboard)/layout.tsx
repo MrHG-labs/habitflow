@@ -6,6 +6,7 @@ import { apiClient } from '@/api/client';
 import { useAuthStore } from '@/stores/authStore';
 import { useThemeStore } from '@/stores/themeStore';
 import { useI18nStore } from '@/stores/i18nStore';
+import { usePomodoroStore } from '@/stores/pomodoroStore';
 import LevelBadge from '@/components/dashboard/LevelBadge';
 import RemindersController from '@/components/habits/RemindersController';
 
@@ -29,6 +30,15 @@ export default function DashboardLayout({
       router.push('/login');
     }
   }, [isAuthenticated, isLoading, router]);
+
+  // Global Pomodoro Ticker
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const timer = setInterval(() => {
+      usePomodoroStore.getState().tick();
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [isAuthenticated]);
 
   /* 5.3 — Loading state */
   if (isLoading) {
@@ -65,6 +75,7 @@ export default function DashboardLayout({
     { label: t('common.dashboard'), href: '/dashboard' },
     { label: t('common.habits'), href: '/habits' },
     { label: t('common.analytics'), href: '/analytics' },
+    { label: t('common.focus'), href: '/focus' },
   ];
 
   return (
@@ -88,11 +99,10 @@ export default function DashboardLayout({
                 <button
                   key={href}
                   onClick={() => router.push(href)}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-                    pathname === href
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${pathname === href
                       ? 'text-white'
                       : 'text-app-secondary hover:text-app-primary'
-                  }`}
+                    }`}
                   style={
                     pathname === href
                       ? { backgroundColor: 'var(--accent)' }
@@ -167,14 +177,11 @@ export default function DashboardLayout({
               <button
                 key={href}
                 onClick={() => router.push(href)}
-                className={`flex-1 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                  pathname === href ? 'text-white' : 'text-app-secondary'
-                }`}
-                style={
-                  pathname === href
-                    ? { backgroundColor: 'var(--accent)' }
-                    : {}
-                }
+                className={`flex-1 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${pathname === href ? 'text-white' : 'text-app-secondary'
+                  } hover:bg-black/10 dark:hover:bg-white/10`}
+                style={{
+                  backgroundColor: pathname === href ? 'var(--accent)' : 'transparent',
+                }}
               >
                 {label}
               </button>
