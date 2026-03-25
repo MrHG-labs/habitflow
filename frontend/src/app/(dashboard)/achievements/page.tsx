@@ -27,6 +27,17 @@ export default function AchievementsPage() {
     );
   }
 
+  // Group by habit to show only the highest achievement per habit (evolutionary approach)
+  const groupedAchievements = achievements.reduce((acc: any, curr) => {
+    const key = curr.habit_id ? String(curr.habit_id) : curr.habit_name_snapshot;
+    if (!acc[key] || curr.milestone_days > acc[key].milestone_days) {
+      acc[key] = curr;
+    }
+    return acc;
+  }, {});
+
+  const displayedAchievements = Object.values(groupedAchievements) as typeof achievements;
+
   return (
     <div className="space-y-8 animate-fade-in-up">
       <header className="flex flex-col gap-2">
@@ -37,7 +48,7 @@ export default function AchievementsPage() {
         <div className="h-1 w-20 rounded-full" style={{ backgroundColor: 'var(--accent)' }} />
       </header>
 
-      {achievements.length === 0 ? (
+      {displayedAchievements.length === 0 ? (
         <div className="card h-64 flex flex-col items-center justify-center text-center gap-4 p-10 border-dashed border-2 opacity-80 backdrop-grayscale-[0.5]">
           <div className="text-5xl opacity-40">🏅</div>
           <div className="space-y-1">
@@ -47,11 +58,12 @@ export default function AchievementsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {achievements.map((achievement, i) => (
+          {displayedAchievements.map((achievement: any, i) => (
             <MedalCard key={achievement.id} achievement={achievement} index={i} />
           ))}
         </div>
-      )}
+      )
+}
 
       {/* Stats summary section */}
       {achievements.length > 0 && (
@@ -63,18 +75,18 @@ export default function AchievementsPage() {
                   </div>
                   <div className="flex flex-wrap gap-4 items-center justify-center">
                       <div className="px-5 py-3 rounded-2xl bg-white/5 border border-white/10 text-center flex flex-col items-center gap-1 shadow-inner group-hover:scale-110 transition-transform duration-300">
-                          <span className="text-2xl font-black text-app-primary">{achievements.length}</span>
+                          <span className="text-2xl font-black text-app-primary">{displayedAchievements.length}</span>
                           <span className="text-[10px] uppercase font-bold text-app-muted spacing tracking-widest">{t('achievements.totalMedals')}</span>
                       </div>
                       <div className="px-5 py-3 rounded-2xl bg-white/5 border border-white/10 text-center flex flex-col items-center gap-1 shadow-inner group-hover:scale-110 transition-transform duration-300 transition-delay-[100ms]">
                           <span className="text-2xl font-black text-app-primary">
-                              {achievements.filter(a => a.medal_type === 'Flame').length}
+                              {displayedAchievements.filter(a => a.medal_type === 'Bronze').length}
                           </span>
-                          <span className="text-[10px] uppercase font-bold text-app-muted spacing tracking-widest">{t('achievements.flameCount')}</span>
+                          <span className="text-[10px] uppercase font-bold text-app-muted spacing tracking-widest">{t('achievements.milestoneBronze')}</span>
                       </div>
                       <div className="px-5 py-3 rounded-2xl bg-white/5 border border-white/10 text-center flex flex-col items-center gap-1 shadow-inner group-hover:scale-110 transition-transform duration-300 transition-delay-[200ms]">
                           <span className="text-2xl font-black text-app-primary">
-                              {achievements.filter(a => ['Gold', 'Diamond'].includes(a.medal_type)).length}
+                              {displayedAchievements.filter(a => ['Gold', 'Platinum', 'Diamond'].includes(a.medal_type)).length}
                           </span>
                           <span className="text-[10px] uppercase font-bold text-app-muted spacing tracking-widest">{t('achievements.topTierCount')}</span>
                       </div>

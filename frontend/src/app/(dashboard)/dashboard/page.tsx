@@ -17,7 +17,19 @@ export default function DashboardPage() {
   // Falling back to specialized queries if needed, though summary covers most
   const { data: todayProgress } = useTodayProgress();
   const { data: weekly } = useWeeklyProgress();
-  const { data: achievements } = useAchievements();
+  const { data: achievementsData } = useAchievements();
+
+  // Group by habit to show only the highest achievement per habit (evolutionary approach)
+  const groupedAchievements = (achievementsData || []).reduce((acc: any, curr) => {
+    const key = curr.habit_name_snapshot;
+    if (!acc[key] || curr.milestone_days > acc[key].milestone_days) {
+      acc[key] = curr;
+    }
+    return acc;
+  }, {});
+
+  const achievements = Object.values(groupedAchievements) as typeof achievementsData;
+
 
   const totalHabits = summary?.total_habits ?? habits?.length ?? 0;
   const completedToday = summary?.completed_today ?? (todayProgress

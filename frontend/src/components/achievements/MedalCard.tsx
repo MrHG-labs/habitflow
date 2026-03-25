@@ -2,6 +2,7 @@
 
 import { Achievement } from '@/types/achievement';
 import { useI18nStore } from '@/stores/i18nStore';
+import EvolutiveMedal from './EvolutiveMedal';
 
 interface MedalCardProps {
   achievement: Achievement;
@@ -9,47 +10,41 @@ interface MedalCardProps {
 }
 
 const MEDAL_STYLES: Record<string, { 
-    icon: string; 
     color: string; 
     gradient: string; 
     shadow: string; 
     border: string;
     descriptionKey: string;
 }> = {
-  Flame: { 
-    icon: '🔥', 
-    color: '#f97316', 
-    gradient: 'from-orange-400 to-red-500', 
-    shadow: 'shadow-orange-500/20', 
-    border: 'border-orange-200',
-    descriptionKey: 'achievements.milestoneFlame'
-  },
   Bronze: { 
-    icon: '🥉', 
-    color: '#d97706', 
-    gradient: 'from-amber-600 to-amber-900', 
-    shadow: 'shadow-amber-900/20', 
-    border: 'border-amber-200',
+    color: '#b57a58', 
+    gradient: 'from-[#b57a58] to-[#8c533c]', 
+    shadow: 'shadow-[#b57a58]/10', 
+    border: 'border-[#b57a58]/20',
     descriptionKey: 'achievements.milestoneBronze'
   },
   Silver: { 
-    icon: '🥈', 
     color: '#94a3b8', 
     gradient: 'from-slate-300 to-slate-500', 
-    shadow: 'shadow-slate-400/20', 
+    shadow: 'shadow-slate-400/10', 
     border: 'border-slate-200',
     descriptionKey: 'achievements.milestoneSilver'
   },
   Gold: { 
-    icon: '🥇', 
     color: '#eab308', 
     gradient: 'from-yellow-300 to-yellow-600', 
-    shadow: 'shadow-yellow-500/20', 
+    shadow: 'shadow-yellow-500/10', 
     border: 'border-yellow-200',
     descriptionKey: 'achievements.milestoneGold'
   },
+  Platinum: { 
+    color: '#475569', 
+    gradient: 'from-slate-400 to-slate-700', 
+    shadow: 'shadow-slate-600/10', 
+    border: 'border-slate-300',
+    descriptionKey: 'achievements.milestonePlatinum'
+  },
   Diamond: { 
-    icon: '💎', 
     color: '#06b6d4', 
     gradient: 'from-cyan-300 to-blue-500', 
     shadow: 'shadow-cyan-400/20', 
@@ -72,11 +67,9 @@ export default function MedalCard({ achievement, index }: MedalCardProps) {
       {/* Glow effect */}
       <div className={`absolute -inset-0.5 bg-gradient-to-r ${style.gradient} rounded-3xl blur opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
       
-      {/* Icon Container */}
-      <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${style.gradient} flex items-center justify-center text-4xl shadow-inner relative z-10`}>
-        <span className="drop-shadow-md select-none">{style.icon}</span>
-        {/* Shine effect */}
-        <div className="absolute inset-0 rounded-full opacity-30 group-hover:animate-pulse" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)' }} />
+      {/* Evolutive Medal Container */}
+      <div className="relative z-10">
+        <EvolutiveMedal tier={achievement.medal_type as any} size={100} />
       </div>
 
       <div className="relative z-10 space-y-1">

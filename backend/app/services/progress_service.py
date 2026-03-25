@@ -50,7 +50,7 @@ def toggle_complete(
 
     # Si se completó, verificar si alcanzó algún hito de medalla
     if progress.completed:
-        check_and_grant_achievement(session, habit_id, user_id, date)
+        check_and_grant_achievement(session, habit_id, user_id, target_date)
 
     return progress
 
@@ -239,7 +239,7 @@ def get_advanced_analytics(
 def get_dashboard_summary(session: Session, user_id: int, target_date: date) -> dict:
     """Get all summary info for the dashboard at once, optimized to avoid N+1 queries."""
     from app.models.habit import Habit
-    from sqlalchemy import select
+
     habits = session.exec(select(Habit).where(Habit.user_id == user_id)).all()
     
     if not habits:
@@ -297,12 +297,13 @@ def check_and_grant_achievement(session: Session, habit_id: int, user_id: int, t
     streak, _ = calculate_streak(session, habit_id, user_id, target_date)
     
     milestones = {
-        3: "Flame",
-        10: "Bronze",
-        21: "Silver",
-        50: "Gold",
-        100: "Diamond"
+        3: "Bronze",
+        7: "Silver",
+        21: "Gold",
+        40: "Platinum",
+        60: "Diamond"
     }
+
     
     if streak in milestones:
         # Check if already granted for this habit and milestone

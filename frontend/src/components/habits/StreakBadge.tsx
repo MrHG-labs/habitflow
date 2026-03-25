@@ -37,10 +37,11 @@ export default function StreakBadge({ habitId }: StreakBadgeProps) {
 
   // Estado de racha positiva (Streak)
   const getBadgeConfig = () => {
-    if (streak >= 100) return { icon: '💎', label: 'Legendary', bg: 'linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%)', color: '#1e293b' };
-    if (streak >= 50) return { icon: '🥇', label: 'Gold', bg: 'linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%)', color: '#92400e' };
-    if (streak >= 21) return { icon: '🥈', label: 'Silver', bg: 'linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%)', color: '#475569' };
-    if (streak >= 10) return { icon: '🥉', label: 'Bronze', bg: 'linear-gradient(135deg, #ffedd5 0%, #fdba74 100%)', color: '#9a3412' };
+    if (streak >= 60) return { icon: '💎', label: 'Diamond', bg: 'linear-gradient(135deg, #e2e8f0 0%, #38bdf8 100%)', color: '#0369a1' };
+    if (streak >= 40) return { icon: '🕊️', label: 'Platinum', bg: 'linear-gradient(135deg, #94a3b8 0%, #475569 100%)', color: '#f1f5f9' };
+    if (streak >= 21) return { icon: '🥇', label: 'Gold', bg: 'linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%)', color: '#92400e' };
+    if (streak >= 7) return { icon: '🥈', label: 'Silver', bg: 'linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%)', color: '#475569' };
+    if (streak >= 3) return { icon: '🥉', label: 'Bronze', bg: 'linear-gradient(135deg, #ffedd5 0%, #d97706 100%)', color: '#451a03' };
     return { icon: '🔥', label: '', bg: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)', color: '#b45309' };
   };
 
