@@ -3,6 +3,7 @@
 import { usePomodoroStore } from '@/stores/pomodoroStore';
 import { useI18nStore } from '@/stores/i18nStore';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 export default function FocusPage() {
   const { t } = useI18nStore();
@@ -35,16 +36,20 @@ export default function FocusPage() {
   const handleSaveConfig = () => {
     updateConfig(fMin, bMin);
     setIsConfigOpen(false);
+    toast.success(t('common.save'));
   };
 
   const handleRequestNotifications = async () => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
-         alert("Notificaciones activadas con éxito");
+         toast.success(t('focus.notifSuccess'));
+      } else {
+         toast.error(t('focus.notifError'));
       }
     }
   };
+
 
   return (
     <div className="space-y-6 animate-fade-in pb-10 flex flex-col items-center">

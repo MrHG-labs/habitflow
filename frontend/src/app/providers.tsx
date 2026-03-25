@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, ReactNode, useEffect } from 'react';
 import { initTheme } from '@/stores/themeStore';
 import { useAuthStore } from '@/stores/authStore';
+import { Toaster } from 'sonner';
 
 export function Providers({ children }: { children: ReactNode }) {
   const { checkAuth } = useAuthStore();
@@ -27,6 +28,7 @@ export function Providers({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <Toaster position="top-right" richColors expand={false} />
       {children}
     </QueryClientProvider>
   );

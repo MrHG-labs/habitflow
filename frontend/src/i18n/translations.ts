@@ -18,6 +18,8 @@ export const translations = {
       focus: 'Enfoque',
       achievements: 'Logros',
       tryAgainLater: 'Por favor, intenta de nuevo más tarde.',
+      exportSuccess: 'Datos exportados con éxito 📥',
+      exportError: 'Error al exportar datos ❌',
     },
     achievements: {
       title: 'Tus Logros',
@@ -53,6 +55,9 @@ export const translations = {
       creatingAccount: 'Creando cuenta...',
       passMismatch: 'Las contraseñas no coinciden',
       passMinLength: 'La contraseña debe tener al menos 6 caracteres',
+      loginSuccess: '¡Bienvenido de nuevo! 👋',
+      registerSuccess: 'Cuenta creada con éxito. ¡A por tus hábitos! 🚀',
+      logoutSuccess: 'Sesión cerrada. ¡Vuelve pronto!',
     },
     dashboard: {
       welcome: '¡Bienvenido de nuevo, {name}! 👋',
@@ -130,6 +135,8 @@ export const translations = {
       breakMin: 'Descanso (min)',
       save: 'Guardar y Aplicar',
       notifications: '🔔 Emitir Notificaciones Push',
+      notifSuccess: 'Notificaciones activadas con éxito',
+      notifError: 'Permiso de notificaciones denegado',
     },
     gamification: {
       levelUp: '¡NIVEL {level}!',
@@ -165,6 +172,8 @@ export const translations = {
       focus: 'Focus',
       achievements: 'Achievements',
       tryAgainLater: 'Please try again later.',
+      exportSuccess: 'Data exported successfully 📥',
+      exportError: 'Failed to export data ❌',
     },
     achievements: {
       title: 'Your Achievements',
@@ -200,6 +209,9 @@ export const translations = {
       creatingAccount: 'Creating account...',
       passMismatch: 'Passwords do not match',
       passMinLength: 'Password must be at least 6 characters',
+      loginSuccess: 'Welcome back! 👋',
+      registerSuccess: 'Account created successfully. Let\'s build habits! 🚀',
+      logoutSuccess: 'Logged out. See you soon!',
     },
     dashboard: {
       welcome: 'Welcome back, {name}! 👋',
@@ -277,6 +289,8 @@ export const translations = {
       breakMin: 'Break (min)',
       save: 'Save and Apply',
       notifications: '🔔 Enable Push Notifications',
+      notifSuccess: 'Notifications enabled successfully',
+      notifError: 'Notification permission denied',
     },
     gamification: {
       levelUp: 'LEVEL {level}!',

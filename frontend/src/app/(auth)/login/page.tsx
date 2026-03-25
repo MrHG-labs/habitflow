@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { useI18nStore } from '@/stores/i18nStore';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -35,11 +36,13 @@ export default function LoginPage() {
     clearError();
     try {
       await login({ email, password });
+      toast.success(t('auth.loginSuccess'));
       router.push('/dashboard');
     } catch {
       // Error is handled by the store
     }
   };
+
 
   return (
     <div

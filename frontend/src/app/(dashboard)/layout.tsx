@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { apiClient } from '@/api/client';
 import { useAuthStore } from '@/stores/authStore';
@@ -9,8 +9,10 @@ import { useI18nStore } from '@/stores/i18nStore';
 import { usePomodoroStore } from '@/stores/pomodoroStore';
 import LevelBadge from '@/components/dashboard/LevelBadge';
 import RemindersController from '@/components/habits/RemindersController';
+import { toast } from 'sonner';
 
 export default function DashboardLayout({
+
   children,
 }: {
   children: React.ReactNode;
@@ -20,13 +22,30 @@ export default function DashboardLayout({
   const { isAuthenticated, isLoading, checkAuth, user } = useAuthStore();
   const { theme, toggle: toggleTheme } = useThemeStore();
   const { language, setLanguage, t } = useI18nStore();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     checkAuth();
   }, [checkAuth]);
 
   useEffect(() => {
+    const handleLevelUp = (e: any) => {
+      const { level } = e.detail;
+      toast.success(t('gamification.levelUp', { level }), {
+        description: t('gamification.congrats'),
+        duration: 5000,
+        icon: '🎊',
+      });
+    };
+
+    window.addEventListener('level_up', handleLevelUp);
+    return () => window.removeEventListener('level_up', handleLevelUp);
+  }, [t]);
+
+  useEffect(() => {
     if (!isLoading && !isAuthenticated) {
+
       router.push('/login');
     }
   }, [isAuthenticated, isLoading, router]);
@@ -41,12 +60,12 @@ export default function DashboardLayout({
   }, [isAuthenticated]);
 
   /* 5.3 — Loading state */
-  if (isLoading) {
+  if (isLoading || !mounted) {
     return (
       <div className="min-h-screen flex items-center justify-center transition-colors" style={{ backgroundColor: 'var(--bg-app)' }}>
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 rounded-full border-4 border-indigo-200 border-t-indigo-600 animate-spin" />
-          <p className="text-app-secondary text-sm">{t('common.loading')}</p>
+          <p className="text-app-secondary text-sm">{mounted ? t('common.loading') : 'Cargando...'}</p>
         </div>
       </div>
     );
@@ -55,6 +74,7 @@ export default function DashboardLayout({
   if (!isAuthenticated) return null;
 
   const handleExport = async () => {
+    toast.info(t('common.loading'));
     try {
       const { data } = await apiClient.get('/auth/export');
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -66,8 +86,10 @@ export default function DashboardLayout({
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      toast.success(t('common.exportSuccess'));
     } catch (err) {
       console.error('Failed to export data', err);
+      toast.error(t('common.exportError'));
     }
   };
 
@@ -161,6 +183,7 @@ export default function DashboardLayout({
                 onClick={() => {
                   useAuthStore.getState().logout();
                   router.push('/login');
+                  toast.success(t('auth.logoutSuccess'));
                 }}
                 className="px-3 py-1.5 rounded-lg text-sm font-medium text-app-secondary border transition-all duration-150 hover:text-danger hover:border-danger"
                 style={{ borderColor: 'var(--border)' }}
