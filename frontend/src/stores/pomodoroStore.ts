@@ -12,10 +12,10 @@ interface PomodoroState {
   timeLeft: number;      // Current time left in seconds
   isRunning: boolean;
   targetEndTime: number | null; // Date.now() timestamp of when it should end
-  
+
   focusDuration: number; // in seconds
   breakDuration: number; // in seconds
-  
+
   startTimer: () => void;
   pauseTimer: () => void;
   resetTimer: () => void;
@@ -60,7 +60,7 @@ export const usePomodoroStore = create<PomodoroState>()(
 
         const now = Date.now();
         const remaining = Math.round((state.targetEndTime - now) / 1000);
-        
+
         if (remaining > 0) {
           if (remaining !== state.timeLeft) {
             set({ timeLeft: remaining });
@@ -69,9 +69,9 @@ export const usePomodoroStore = create<PomodoroState>()(
           // Timer finished
           try {
             // Play notification sound (browser will block if no prior user interaction, but usually fine here)
-            const audio = new Audio('/notification.mp3'); 
-            audio.play().catch(() => {});
-          } catch(e) {}
+            const audio = new Audio('/notification.mp3');
+            audio.play().catch(() => { });
+          } catch (e) { }
 
           if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
             new Notification(state.mode === 'focus' ? '¡Tiempo Completo!' : '¡Descanso Terminado!', {
@@ -80,13 +80,13 @@ export const usePomodoroStore = create<PomodoroState>()(
           }
 
           if (state.mode === 'focus') {
-             state.completeSession().then(() => {
-               get().setMode('break');
-               get().startTimer(); // auto-start break
-             });
+            state.completeSession().then(() => {
+              get().setMode('break');
+              get().startTimer(); // auto-start break
+            });
           } else {
-             get().setMode('focus');
-             // Do not auto-start focus again to prevent infinite loops if user is away.
+            get().setMode('focus');
+            // Do not auto-start focus again to prevent infinite loops if user is away.
           }
         }
       },
@@ -104,20 +104,20 @@ export const usePomodoroStore = create<PomodoroState>()(
       completeSession: async () => {
         const { focusDuration } = get();
         try {
-          const res = await apiClient.post('/progress/focus/reward', { 
-            duration_minutes: Math.round(focusDuration / 60) 
+          const res = await apiClient.post('/progress/focus/reward', {
+            duration_minutes: Math.round(focusDuration / 60)
           });
           const { user_xp, new_level, leveled_up, xp_gained } = res.data;
-          
+
           if (leveled_up && typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('level_up', { detail: { level: new_level } }));
           }
-          
+
           const authUpdateXp = useAuthStore.getState();
           if (authUpdateXp.checkAuth) {
-             authUpdateXp.checkAuth();
+            authUpdateXp.checkAuth();
           }
-        } catch(e) {
+        } catch (e) {
           console.error("Error rewarding XP", e);
         }
       },

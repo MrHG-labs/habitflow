@@ -151,7 +151,10 @@ def focus_reward(
             detail="Limíte de duración de enfoque superado (Mínimo 1 min, Máximo 120 min)"
         )
 
-    xp_delta = session_data.duration_minutes * 2
+    # XP awarded based on duration. 0.2 XP per minute so focus is a secondary tool.
+    # 25 min = 5 XP, 60 min = 12 XP.
+    xp_delta = round(session_data.duration_minutes * 0.2)
+
     
     current_user.xp += xp_delta
     # Use existing rule for levels

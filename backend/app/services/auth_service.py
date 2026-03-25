@@ -72,9 +72,9 @@ def create_user(session: Session, email: str, username: str, password: str) -> U
 XP_PER_HABIT = 10
 
 # Level thresholds: XP needed to reach each level.
-# Level 1 = 0, Level 2 = 100, Level 3 = 250, Level 4 = 450, ...
-# Formula: xp_for_level(n) = 100 * (n-1) + 50 * (n-2)*(n-1) // 2  → simplified below
-LEVEL_THRESHOLDS = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700, 3250]
+# Level 1 = 0, Level 2 = 500, Level 3 = 1250, Level 4 = 2250, Level 5 = 3500, ...
+LEVEL_THRESHOLDS = [0, 500, 1250, 2250, 3500, 5000, 6750, 8750, 11000, 13500, 16250]
+
 
 
 def calculate_level(xp: int) -> int:
