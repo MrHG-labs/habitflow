@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import { Habit } from '@/types/habit';
+import { useI18nStore } from '@/stores/i18nStore';
 
 /**
  * useReminders — Web Notifications API integration
@@ -11,38 +12,51 @@ import { Habit } from '@/types/habit';
  * per calendar day using a Set stored in a ref.
  */
 export function useReminders(habits: Habit[] | undefined) {
+  const { t } = useI18nStore();
   // Track which (habitId + date) pairs have already been notified today
   const firedRef = useRef<Set<string>>(new Set());
 
   const checkAndNotify = useCallback(() => {
     if (!habits || habits.length === 0) return;
     if (typeof window === 'undefined') return;
-    if (Notification.permission !== 'granted') return;
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
 
     const now = new Date();
-    const hh = String(now.getHours()).padStart(2, '0');
-    const mm = String(now.getMinutes()).padStart(2, '0');
-    const currentTime = `${hh}:${mm}`;
-    const today = now.toDateString();
+    const todayStr = now.toDateString();
+    const currentTotalMinutes = now.getHours() * 60 + now.getMinutes();
 
     habits.forEach((habit) => {
       if (!habit.reminder_time) return;
-      if (habit.reminder_time !== currentTime) return;
 
-      const key = `${habit.id}::${today}`;
+      const [h, m] = habit.reminder_time.split(':').map(Number);
+      const reminderTotalMinutes = h * 60 + m;
+      const key = `${habit.id}::${todayStr}`;
+
       if (firedRef.current.has(key)) return;
 
-      firedRef.current.add(key);
+      // Allow a 2-minute window to handle interval skips/throttling
+      const diff = currentTotalMinutes - reminderTotalMinutes;
+      if (diff >= 0 && diff < 2) {
+        firedRef.current.add(key);
 
-      new Notification(`${habit.icon} ¡Hora de tu hábito!`, {
-        body: `No olvides completar: ${habit.name}`,
-        icon: '/favicon.ico',
-        tag: `habit-${habit.id}`, // prevents duplicate system-level toasts
-        badge: '/favicon.ico',
-        silent: false,
-      });
+        const title = `${habit.icon} ${t('reminders.notifTitle')}`;
+        const body = t('reminders.notifBody', { habit: habit.name });
+
+        const notification = new Notification(title, {
+          body: body,
+          icon: '/favicon.ico',
+          tag: `habit-${habit.id}-${todayStr}`,
+          badge: '/favicon.ico',
+          requireInteraction: true,
+        });
+
+        notification.onclick = () => {
+          window.focus();
+          notification.close();
+        };
+      }
     });
-  }, [habits]);
+  }, [habits, t]);
 
   useEffect(() => {
     // Run immediately on mount / habit change
