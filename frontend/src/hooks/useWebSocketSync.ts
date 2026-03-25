@@ -20,9 +20,10 @@ export function useWebSocketSync() {
       return;
     }
 
-    // Determine WebSocket URL from apiClient baseURL (or window.location if relative)
-    const baseURL = apiClient.defaults.baseURL || 'http://localhost:8000/api';
+    // Determine WebSocket URL from apiClient baseURL
+    const baseURL = apiClient.defaults.baseURL!;
     const wsURLStr = baseURL.replace(/^http/, 'ws').replace(/\/api\/?$/, '');
+
     const wsEndpoint = `${wsURLStr}/api/ws/sync?token=${token}`;
 
     const connect = () => {
