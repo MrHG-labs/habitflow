@@ -3,8 +3,10 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, ReactNode, useEffect } from 'react';
 import { initTheme } from '@/stores/themeStore';
+import { useAuthStore } from '@/stores/authStore';
 
 export function Providers({ children }: { children: ReactNode }) {
+  const { checkAuth } = useAuthStore();
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -17,10 +19,11 @@ export function Providers({ children }: { children: ReactNode }) {
       })
   );
 
-  // Restore dark/light theme from localStorage on first render
+  // Restore dark/light theme and check auth on first render
   useEffect(() => {
     initTheme();
-  }, []);
+    checkAuth();
+  }, [checkAuth]);
 
   return (
     <QueryClientProvider client={queryClient}>

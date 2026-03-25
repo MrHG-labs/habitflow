@@ -71,17 +71,32 @@ def get_today_progress(
     for row in rows:
         result[row.habit_id] = row.completed
     return result
-
-
-def calculate_streak(session: Session, habit_id: int, user_id: int, target_date: date) -> tuple[int, int]:
+def calculate_streak(session: Session, habit_id: int, user_id: int, target_date: date):
     """
-    Calculate the consecutive-days streak for a habit up to today.
-    Uses interval gaps to support flexible frequencies (every_other_day, weekly, etc).
+    Get the current streak for a habit by id.
+    Returns (streak_count, effective_neglect).
     """
     habit = session.get(Habit, habit_id)
     if not habit:
         return 0, 0
 
+    # Fetch progress
+    completed_progress = session.exec(
+        select(HabitProgress)
+        .where(
+            HabitProgress.habit_id == habit_id,
+            HabitProgress.user_id == user_id,
+            HabitProgress.date <= target_date,
+            HabitProgress.completed == True  # noqa: E712
+        )
+        .order_by(HabitProgress.date.desc())
+    ).all()
+
+    return calculate_streak_from_list(habit, completed_progress, target_date)
+
+
+def calculate_streak_from_list(habit: "Habit", completed_progress: list["HabitProgress"], target_date: date):  # noqa: F821
+    """In-memory calculation of streak given a pre-fetched list of completions."""
     freq_map = {
         "daily": 1,
         "every_other_day": 2,
@@ -91,25 +106,12 @@ def calculate_streak(session: Session, habit_id: int, user_id: int, target_date:
     }
     max_gap = freq_map.get(habit.frequency, 1)
 
-    completed_progress = session.exec(
-        select(HabitProgress)
-        .where(
-            HabitProgress.habit_id == habit_id,
-            HabitProgress.user_id == user_id,
-            HabitProgress.completed == True,  # noqa: E712
-            HabitProgress.date <= target_date
-        )
-        .order_by(HabitProgress.date.desc())
-    ).all()
-
     if not completed_progress:
         days_total = (target_date - habit.created_at.date()).days
         # Solo consideramos abandono si supera la periodicidad base
         return 0, max(0, days_total - max_gap + 1)
 
     days_since_last = (target_date - completed_progress[0].date).days
-
-    # Solo hay "Abandono" si excedemos el gap de la periodicidad (max_gap)
     effective_neglect = max(0, days_since_last - max_gap)
 
     # Check if the streak is already broken up to target_date
@@ -235,12 +237,11 @@ def get_advanced_analytics(
 
 
 def get_dashboard_summary(session: Session, user_id: int, target_date: date) -> dict:
-    """Get all summary info for the dashboard at once."""
+    """Get all summary info for the dashboard at once, optimized to avoid N+1 queries."""
     from app.models.habit import Habit
-    from sqlmodel import select
+    from sqlalchemy import select
     habits = session.exec(select(Habit).where(Habit.user_id == user_id)).all()
     
-    # 0. Base case
     if not habits:
         return {
             "completed_today": 0,
@@ -250,18 +251,35 @@ def get_dashboard_summary(session: Session, user_id: int, target_date: date) -> 
             "weekly_progress": get_weekly_completions(session, user_id, target_date)
         }
 
-    # 1. Today's progress
-    habit_ids = [h.id for h in habits]
-    today_progress_map = get_today_progress(session, user_id, habit_ids, target_date)
-    completed_today = sum(1 for v in today_progress_map.values() if v)
-
-    # 2. Streaks and Neglect
-    streaks_data = [calculate_streak(session, h.id, user_id, target_date) for h in habits]
-    max_streak = max((s[0] for s in streaks_data), default=0)
+    # 1. Fetch ALL completed progress for this user in ONE query
+    all_completed = session.exec(
+        select(HabitProgress).where(
+            HabitProgress.user_id == user_id,
+            HabitProgress.completed == True,  # noqa: E712
+            HabitProgress.date <= target_date
+        ).order_by(HabitProgress.date.desc())
+    ).all()
     
-    # 3. Momentum: penalized by neglect 
-    # Momentum = 100% - (ratio of neglected habits * 100)
+    # 2. Organize in memory by habit_id
+    progress_by_habit = {}
+    for p in all_completed:
+        if p.habit_id not in progress_by_habit:
+            progress_by_habit[p.habit_id] = []
+        progress_by_habit[p.habit_id].append(p)
+
+    # 3. Calculate metrics efficiently
+    completed_today = sum(1 for p in all_completed if p.date == target_date)
+    
+    streaks_data = []
+    for h in habits:
+        h_progress = progress_by_habit.get(h.id, [])
+        streak_info = calculate_streak_from_list(h, h_progress, target_date)
+        streaks_data.append(streak_info)
+    
+    max_streak = max((s[0] for s in streaks_data), default=0)
     neglected_count = sum(1 for s in streaks_data if s[1] >= 1)
+    
+    # Momentum = 100 - (% of neglected habits)
     momentum = 100 - int((neglected_count / len(habits)) * 100)
 
     return {
@@ -271,6 +289,7 @@ def get_dashboard_summary(session: Session, user_id: int, target_date: date) -> 
         "streak_count": max_streak,
         "weekly_progress": get_weekly_completions(session, user_id, target_date)
     }
+
 
 
 def check_and_grant_achievement(session: Session, habit_id: int, user_id: int, target_date: date):

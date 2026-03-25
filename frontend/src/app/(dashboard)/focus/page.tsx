@@ -117,14 +117,30 @@ export default function FocusPage() {
       {isConfigOpen && (
         <div className="card w-full max-w-md p-6 rounded-2xl shadow-sm animate-slide-up" style={{ backgroundColor: 'var(--bg-app)', border: '1px solid var(--border)' }}>
           <h3 className="font-bold text-app-primary mb-4">{t('focus.settings')}</h3>
-          <div className="flex gap-4">
-             <div className="flex flex-col flex-1">
-               <label className="text-xs font-semibold text-app-secondary mb-1">{t('focus.workMin')}</label>
-               <input type="number" min={1} value={fMin} onChange={e => setFMin(Number(e.target.value))} className="p-2 border rounded-lg bg-transparent text-app-primary focus:outline-none focus:border-indigo-500" style={{ borderColor: 'var(--border)' }} />
+          <div className="flex justify-center gap-6 mt-2">
+             <div className="flex flex-col items-center">
+               <label className="text-[10px] uppercase tracking-wider font-bold text-app-muted mb-2">{t('focus.workMin')}</label>
+               <input 
+                type="number" 
+                min={1} 
+                max={99}
+                value={fMin} 
+                onChange={e => setFMin(Number(e.target.value))} 
+                className="w-20 p-3 text-center border-2 rounded-2xl bg-white dark:bg-slate-800 text-app-primary font-bold focus:outline-none focus:border-accent transition-all shadow-sm" 
+                style={{ borderColor: 'var(--border)' }} 
+               />
              </div>
-             <div className="flex flex-col flex-1">
-               <label className="text-xs font-semibold text-app-secondary mb-1">{t('focus.breakMin')}</label>
-               <input type="number" min={1} value={bMin} onChange={e => setBMin(Number(e.target.value))} className="p-2 border rounded-lg bg-transparent text-app-primary focus:outline-none focus:border-indigo-500" style={{ borderColor: 'var(--border)' }} />
+             <div className="flex flex-col items-center">
+               <label className="text-[10px] uppercase tracking-wider font-bold text-app-muted mb-2">{t('focus.breakMin')}</label>
+               <input 
+                type="number" 
+                min={1} 
+                max={60}
+                value={bMin} 
+                onChange={e => setBMin(Number(e.target.value))} 
+                className="w-20 p-3 text-center border-2 rounded-2xl bg-white dark:bg-slate-800 text-app-primary font-bold focus:outline-none focus:border-accent transition-all shadow-sm" 
+                style={{ borderColor: 'var(--border)' }} 
+               />
              </div>
           </div>
           <button 

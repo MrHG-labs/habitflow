@@ -83,7 +83,7 @@ export default function DashboardPage() {
 
       {/* Momentum / Energy Section */}
       <div className="grid grid-cols-1 gap-6 animate-fade-in-up" style={{ animationDelay: '275ms' }}>
-        <div className="card p-6 bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 overflow-hidden relative border-l-4" style={{ borderLeftColor: momentum > 70 ? 'var(--success)' : momentum > 30 ? '#f59e0b' : 'var(--danger)' }}>
+        <div className="card p-6 overflow-hidden relative border-l-4 bg-gradient-to-br from-[var(--bg-card)] to-[var(--bg-app)] shadow-lg" style={{ borderLeftColor: momentum > 70 ? 'var(--success)' : momentum > 30 ? '#f59e0b' : 'var(--danger)' }}>
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h3 className="text-lg font-bold text-app-primary flex items-center gap-2">
