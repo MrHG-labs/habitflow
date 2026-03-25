@@ -1,10 +1,13 @@
 'use client';
 
+import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
 import { useI18nStore } from '@/stores/i18nStore';
 import { useHabits } from '@/hooks/useHabits';
 import { useTodayProgress, useWeeklyProgress, useDashboardSummary } from '@/hooks/useProgress';
+import { useAchievements } from '@/hooks/useAchievements';
 import LevelBadge from '@/components/dashboard/LevelBadge';
+import MedalCard from '@/components/achievements/MedalCard';
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
@@ -14,6 +17,7 @@ export default function DashboardPage() {
   // Falling back to specialized queries if needed, though summary covers most
   const { data: todayProgress } = useTodayProgress();
   const { data: weekly } = useWeeklyProgress();
+  const { data: achievements } = useAchievements();
 
   const totalHabits = summary?.total_habits ?? habits?.length ?? 0;
   const completedToday = summary?.completed_today ?? (todayProgress
@@ -172,6 +176,34 @@ export default function DashboardPage() {
         <h3 className="text-base font-semibold text-app-primary mb-1">{t('dashboard.totalXp')}</h3>
         <p className="text-3xl font-bold" style={{ color: '#a855f7' }}>{user?.xp ?? 0}</p>
         <p className="text-app-muted text-sm mt-1">{t('dashboard.xpGoal')}</p>
+      </div>
+
+      {/* Achievements Section */}
+      <div className="space-y-4 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-bold text-app-primary flex items-center gap-2">
+            🏆 {t('achievements.title')}
+          </h3>
+        </div>
+        
+        {!achievements || achievements.length === 0 ? (
+          <div className="card h-40 flex flex-col items-center justify-center text-center p-6 border-dashed border-2 opacity-60">
+            <p className="text-sm text-app-secondary">{t('achievements.noData')}</p>
+            <p className="text-xs text-app-muted mt-1">{t('achievements.startWorking')}</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pb-10">
+            {achievements.slice(0, 4).map((achievement, i) => (
+              <MedalCard key={achievement.id} achievement={achievement} index={i} />
+            ))}
+            {achievements.length > 4 && (
+              <Link href="/achievements" className="card p-6 flex flex-col items-center justify-center text-center group cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-all hover:scale-105">
+                <span className="text-2xl mb-1">➕</span>
+                <span className="text-xs font-bold text-app-secondary">{t('achievements.totalMedals')}: {achievements.length}</span>
+              </Link>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

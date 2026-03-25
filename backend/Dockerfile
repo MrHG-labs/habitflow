@@ -22,8 +22,8 @@ ENV UV_COMPILE_BYTECODE=1
 # Copy project files
 COPY pyproject.toml uv.lock ./
 
-# Install dependencies GLOBALLY (system-wide) to avoid venv mapping issues
-RUN uv pip install --system --no-cache email-validator fastapi uvicorn[standard] sqlmodel sqlalchemy psycopg2-binary "python-jose[cryptography]" "pwdlib[argon2]" pydantic pydantic-settings python-multipart alembic ruff
+# Install dependencies in system environment
+RUN uv pip install --system --no-cache -r pyproject.toml
 
 # Copy the rest of the application
 COPY . .

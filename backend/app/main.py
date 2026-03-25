@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import init_db
 from app.routers import auth, habits
 from app.routers import progress as progress_router
-from app.routers import websocket
+from app.routers import achievements, websocket
 from app.dependencies.rate_limiter import limiter
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -52,6 +52,7 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/api")
 app.include_router(habits.router, prefix="/api")
 app.include_router(progress_router.router, prefix="/api")
+app.include_router(achievements.router, prefix="/api")
 app.include_router(websocket.router, prefix="/api")
 
 @app.get("/health")
