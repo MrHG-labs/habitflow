@@ -1,5 +1,6 @@
 'use client';
 
+import EvolutiveTree from './EvolutiveTree';
 import { useI18nStore } from '@/stores/i18nStore';
 
 interface LevelBadgeProps {
@@ -8,17 +9,17 @@ interface LevelBadgeProps {
   compact?: boolean;
 }
 
-const LEVEL_METADATA: Record<number, { emoji: string; color: string; gradient: string }> = {
-  1:  { emoji: '🌱', color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300', gradient: 'from-gray-300 to-gray-400' },
-  2:  { emoji: '🔍', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300', gradient: 'from-blue-300 to-blue-500' },
-  3:  { emoji: '⚡', color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300', gradient: 'from-indigo-300 to-indigo-500' },
-  4:  { emoji: '🏅', color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300', gradient: 'from-purple-300 to-purple-500' },
-  5:  { emoji: '⭐', color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300', gradient: 'from-yellow-300 to-yellow-500' },
-  6:  { emoji: '💎', color: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300', gradient: 'from-cyan-300 to-cyan-500' },
-  7:  { emoji: '🚀', color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300', gradient: 'from-orange-300 to-orange-500' },
-  8:  { emoji: '🦸', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300', gradient: 'from-red-300 to-red-500' },
-  9:  { emoji: '🌟', color: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300', gradient: 'from-pink-300 to-pink-500' },
-  10: { emoji: '👑', color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300', gradient: 'from-amber-300 to-amber-500' },
+const LEVEL_METADATA: Record<number, { color: string; gradient: string }> = {
+  1:  { color: 'bg-green-50 text-green-700 dark:bg-green-900/10 dark:text-green-300', gradient: 'from-green-100 to-green-200' },
+  2:  { color: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200', gradient: 'from-green-200 to-green-300' },
+  3:  { color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200', gradient: 'from-emerald-200 to-emerald-300' },
+  4:  { color: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-200', gradient: 'from-teal-200 to-teal-300' },
+  5:  { color: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-200', gradient: 'from-cyan-200 to-cyan-300' },
+  6:  { color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200', gradient: 'from-blue-200 to-blue-300' },
+  7:  { color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-200', gradient: 'from-indigo-200 to-indigo-300' },
+  8:  { color: 'bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-200', gradient: 'from-violet-200 to-violet-300' },
+  9:  { color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200', gradient: 'from-purple-200 to-purple-300' },
+  10: { color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200', gradient: 'from-amber-200 to-amber-300' },
 };
 
 export default function LevelBadge({ level, xp, compact = false }: LevelBadgeProps) {
@@ -28,23 +29,22 @@ export default function LevelBadge({ level, xp, compact = false }: LevelBadgePro
 
   if (compact) {
     return (
-      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold transition-all duration-200 shadow-sm hover:scale-105 ${meta.color}`}>
-        {meta.emoji} Lv.{level}
+      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 shadow-sm border border-black/5 dark:border-white/5 hover:scale-105 ${meta.color}`}>
+        <EvolutiveTree level={level} size={18} />
+        Lv.{level}
       </span>
     );
   }
 
   return (
-    <div className={`inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl font-bold transition-all duration-300 shadow-md group hover:shadow-lg hover:scale-105 ${meta.color}`}>
-      <span
-        className="text-2xl transition-transform group-hover:scale-125 duration-300"
-        style={{ animation: 'pulse 2s ease-in-out infinite' }}
-      >
-        {meta.emoji}
-      </span>
-      <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
-        <span className="text-sm">Lv.{level} · {translatedLabel}</span>
-        <span className="text-[10px] uppercase tracking-wider opacity-60 font-black">{xp} XP</span>
+    <div className={`inline-flex items-center gap-3.5 px-6 py-3 rounded-2xl font-bold transition-all duration-500 shadow-lg group hover:shadow-xl hover:scale-105 relative overflow-hidden backdrop-blur-md border border-white/20 dark:border-white/5 ${meta.color}`}>
+      <EvolutiveTree level={level} size={48} className="transition-transform group-hover:scale-110 duration-500" />
+      <div className="flex flex-col sm:items-baseline sm:gap-2">
+        <span className="text-sm font-black tracking-tight">{t('dashboard.yourLevel')}: <span className="text-base text-app-primary">{translatedLabel}</span></span>
+        <div className="flex items-center gap-2">
+           <span className="text-xs opacity-60">Lv.{level}</span>
+           <span className="text-[11px] uppercase tracking-wider opacity-50 font-black">· {xp} XP</span>
+        </div>
       </div>
       {/* Shine effect on hover */}
       <div
