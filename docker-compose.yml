@@ -9,11 +9,11 @@ services:
       POSTGRES_PASSWORD: habitflow_password
       POSTGRES_DB: habitflow
     ports:
-      - "5432:5432"
+      - "5438:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U habitflow_user -d habitflow"]
+      test: [ "CMD-SHELL", "pg_isready -U habitflow_user -d habitflow" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -27,7 +27,7 @@ services:
       dockerfile: Dockerfile
     container_name: habitflow_backend
     ports:
-      - "8000:8000"
+      - "8008:8000"
     volumes:
       - ./backend:/app
       - /app/.venv
@@ -41,7 +41,7 @@ services:
     restart: unless-stopped
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     healthcheck:
-      test: ["CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:8000/health\")'"]
+      test: [ "CMD-SHELL", "python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:8000/health\")'" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -58,13 +58,13 @@ services:
       backend:
         condition: service_started
     ports:
-      - "3000:3000"
+      - "3008:3000"
     volumes:
       - ./frontend:/app
       - /app/node_modules
       - /app/.next
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NODE_ENV=development
     restart: unless-stopped
     command: npm run dev
     networks:

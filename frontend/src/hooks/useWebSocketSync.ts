@@ -22,9 +22,17 @@ export function useWebSocketSync() {
 
     // Determine WebSocket URL from apiClient baseURL
     const baseURL = apiClient.defaults.baseURL!;
-    const wsURLStr = baseURL.replace(/^http/, 'ws').replace(/\/api\/?$/, '');
-
-    const wsEndpoint = `${wsURLStr}/api/ws/sync?token=${token}`;
+    let wsEndpoint;
+    
+    if (baseURL.startsWith('http')) {
+      const wsURLStr = baseURL.replace(/^http/, 'ws').replace(/\/api\/?$/, '');
+      wsEndpoint = `${wsURLStr}/api/ws/sync?token=${token}`;
+    } else {
+      // Relative URL under proxy (e.g. "/api")
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const host = window.location.host;
+      wsEndpoint = `${protocol}//${host}/api/ws/sync?token=${token}`;
+    }
 
     const connect = () => {
       // Prevent multiple connections
