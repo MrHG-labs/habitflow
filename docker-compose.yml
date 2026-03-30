@@ -35,6 +35,7 @@ services:
       - DATABASE_URL=postgresql://habitflow_user:habitflow_password@db:5432/habitflow
       - SECRET_KEY=dev-secret-key-change-in-production
       - ENVIRONMENT=development
+      - ALLOWED_ORIGINS=http://habitflow_frontend:3000,http://localhost:3008,http://127.0.0.1:3008,*
     depends_on:
       db:
         condition: service_healthy
@@ -65,6 +66,7 @@ services:
       - /app/.next
     environment:
       - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://habitflow_backend:8000
     restart: unless-stopped
     command: npm run dev
     networks:
