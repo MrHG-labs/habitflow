@@ -1,7 +1,6 @@
 # OS files
 .DS_Store
 Thumbs.db
-*.swp
 
 # IDEs
 .vscode/
@@ -40,16 +39,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
-# vercel
-.vercel
-
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# Antigravity/Gemini Artifacts
-.gemini/
-.agents/
 
 # Python-generated files
 __pycache__/
