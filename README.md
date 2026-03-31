@@ -103,8 +103,12 @@
 
 ## 🔗 Enlace de la Demo
 
-- [Enlace de la Demo](https://habitflow.mr-hgdev.online/)
+- **[Enlace de la Demo](https://habitflow.mr-hgdev.online/)**
 
+- **usuario de prueba** test@example.com
+- **password** 12345678
+
+> **Nota:** Eres libre de crear tu propio usuario en [Regístrate](https://habitflow.mr-hgdev.online/register)
 ## 📸 Capturas de Pantalla
 
 ### Dashboard Principal
