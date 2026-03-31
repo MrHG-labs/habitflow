@@ -59,3 +59,7 @@ wheels/
 *.sqlite
 *.sqlite3
 *.db-journal
+
+# imagenes docker
+/usb_export
+export.sh

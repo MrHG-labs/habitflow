@@ -23,6 +23,7 @@
 
 - [🌟 Características](#-características)
 - [🛠️ Tech Stack](#-tech-stack)
+- [🔗 Enlace de la Demo](#-enlace-de-la-demo)
 - [📸 Capturas de Pantalla](#-capturas-de-pantalla)
 - [💻 Desarrollo Local](#-desarrollo-local)
 - [📚 API Documentation](#-api-documentation)
@@ -88,7 +89,21 @@
 - **Plataforma:** CubePath
 - **Contenedores:** Docker + Docker Compose
 
+### Uso de cubepath para el despliegue
+- he hecho mi registro en cubepath a traves del enlace de la hackatón [midu.link/cubepath](https://midu.link/cubepath)
+- una vez adquiridos los $15 de saldo he desplegado mi VPS de 2GB de RAM y 1 vCPU **gp.nano**
+- lo he configurado con **debian 13**
+- luego a través de ssh me he conectado a mi VPS y he actualizado debian con `sudo apt update && sudo apt upgrade -y`
+- he instalado docker y docker compose
+- luego he clonado mi repositorio con `git clone <url-del-repositorio>`
+- y levantado el mismo con `docker-compose up -d`
+- una vez corregidos algunos fix de despliegue he configurado el dominio `habitflow.mr-hgdev.online` con cloudflare para que apunte a mi VPS
+
 ---
+
+## 🔗 Enlace de la Demo
+
+- [Enlace de la Demo](https://habitflow.mr-hgdev.online/)
 
 ## 📸 Capturas de Pantalla
 
